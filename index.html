@@ -13,24 +13,8 @@
             transition: background-color 0.3s ease, color 0.2s ease, border-color 0.2s ease;
         }
 
+        /* Dark Mode is now DEFAULT */
         :root {
-            --bg-page: #f5f7fb;
-            --card-bg: #ffffff;
-            --text-primary: #1a2c3e;
-            --text-secondary: #5a6e7c;
-            --text-muted: #8a9aa8;
-            --border: #e2e8f0;
-            --accent: #4361ee;
-            --accent-hover: #3850d4;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --input-bg: #ffffff;
-            --hover-bg: #f8fafc;
-        }
-
-        body.dark {
             --bg-page: #000000;
             --card-bg: #000000;
             --text-primary: #f1f5f9;
@@ -39,9 +23,27 @@
             --border: #334155;
             --accent: #6366f1;
             --accent-hover: #818cf8;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             --input-bg: #0f172a;
             --hover-bg: #334155;
+        }
+
+        /* Light Mode (optional toggle) */
+        body.light {
+            --bg-page: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-primary: #1a2c3e;
+            --text-secondary: #5a6e7c;
+            --text-muted: #8a9aa8;
+            --border: #e2e8f0;
+            --accent: #4361ee;
+            --accent-hover: #3850d4;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --input-bg: #ffffff;
+            --hover-bg: #f8fafc;
         }
 
         body {
@@ -60,7 +62,7 @@
         .header {
             display: flex;
             display: none;
- justify-content: space-between;
+            justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
@@ -353,6 +355,7 @@
             background: var(--card-bg);
             border-radius: 20px;
             padding: 25px;
+            margin-bottom: 30px;
             border: 1px solid var(--border);
         }
 
@@ -403,7 +406,7 @@
 
         th, td {
             padding: 12px;
-            text-align: right;
+            text-align: center;
             border-bottom: 1px solid var(--border);
         }
 
@@ -453,8 +456,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Monthly Expense Tracker</h1>
-            <button class="dark-toggle" id="darkModeToggle">🌙 Dark Mode</button>
+            <h1> Monthly Expense Tracker</h1>
+            <button class="dark-toggle" id="darkModeToggle">☀️ Light Mode</button>
         </div>
 
         <!-- Month Selector & Salary -->
@@ -534,7 +537,7 @@
                 <button class="delete-all" id="deleteAllBtn"> Delete All</button>
             </div>
             <div id="transactionsList">
-                <div class="empty-message">No expenses yet. Add your first expense above!</div>
+                <div class="empty-message"> No expenses yet. Add your first expense above!</div>
             </div>
         </div>
     </div>
@@ -769,7 +772,7 @@
         
         function getCategoryIcon(category) {
             const icons = { Food: '', Outings: '', Savings: '', Other: '' };
-            return icons[category] || '📌';
+            return icons[category] || '';
         }
         
         function escapeHtml(str) {
@@ -832,7 +835,7 @@
         }
         
         function deleteAllExpenses() {
-            if (confirm('⚠️ Are you sure you want to delete ALL expenses for this month? This cannot be undone.')) {
+            if (confirm(' Are you sure you want to delete ALL expenses for this month? This cannot be undone.')) {
                 const monthData = getCurrentMonthData();
                 monthData.expenses = [];
                 saveAllData();
@@ -864,19 +867,20 @@
             updateUI();
         }
         
-        // Dark Mode
+        // Dark Mode - NOW DEFAULT IS DARK
         function initDarkMode() {
-            const isDark = localStorage.getItem('darkMode') === 'true';
-            if (isDark) {
-                document.body.classList.add('dark');
+            const isLight = localStorage.getItem('lightMode') === 'true';
+            if (isLight) {
+                document.body.classList.add('light');
             }
-            document.getElementById('darkModeToggle').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+            // Dark mode is default (no class means dark)
+            document.getElementById('darkModeToggle').textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
         }
         
         function toggleDarkMode() {
-            const isDark = document.body.classList.toggle('dark');
-            localStorage.setItem('darkMode', isDark);
-            document.getElementById('darkModeToggle').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+            const isLight = document.body.classList.toggle('light');
+            localStorage.setItem('lightMode', isLight);
+            document.getElementById('darkModeToggle').textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
         }
         
         // Event Listeners
