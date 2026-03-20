@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Monthly Expense Tracker - Track Your Salary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        :root {
+            --bg-page: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-primary: #1a2c3e;
+            --text-secondary: #5a6e7c;
+            --text-muted: #8a9aa8;
+            --border: #e2e8f0;
+            --accent: #4361ee;
+            --accent-hover: #3850d4;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --input-bg: #ffffff;
+            --hover-bg: #f8fafc;
+        }
+
+        body.dark {
+            --bg-page: #000000;
+            --card-bg: #000000;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --input-bg: #0f172a;
+            --hover-bg: #334155;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            display: none;
+ justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dark-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .dark-toggle:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Month Selector */
+        .month-selector {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .month-nav button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .month-nav button:hover {
+            background: var(--accent-hover);
+        }
+
+        .current-month {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .salary-setting {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .salary-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .salary-input label {
+            font-weight: bold;
+        }
+
+        .salary-input input {
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            width: 150px;
+        }
+
+        .set-salary-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card .amount {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .card .sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .remaining-card {
+            border-right: 4px solid var(--success);
+        }
+
+        .remaining-card .amount {
+            color: var(--success);
+        }
+
+        /* Category Budgets */
+        .budget-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .budget-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid var(--border);
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .budget-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .budget-amount {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .progress-bar {
+            background: var(--border);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            background: var(--accent);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-fill.warning {
+            background: var(--warning);
+        }
+
+        .progress-fill.danger {
+            background: var(--danger);
+        }
+
+        .budget-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .edit-budget-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .edit-budget-btn:hover {
+            background: var(--border);
+        }
+
+        /* Form */
+        .form-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .input-field label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+        }
+
+        .input-field input, .input-field select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .add-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Transactions Table */
+        .transactions-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .delete-all {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .expense-row {
+            color: var(--expense);
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+            }
+            th, td {
+                font-size: 0.75rem;
+                padding: 8px;
+            }
+            .amount {
+                font-size: 1.5rem;
+            }
+            .current-month {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Monthly Expense Tracker</h1>
+            <button class="dark-toggle" id="darkModeToggle">🌙 Dark Mode</button>
+        </div>
+
+        <!-- Month Selector & Salary -->
+        <div class="month-selector">
+            <div class="month-nav">
+                <button id="prevMonth">←</button>
+                <span class="current-month" id="currentMonthDisplay">January 2024</span>
+                <button id="nextMonth">→</button>
+            </div>
+            <div class="salary-setting">
+                <div class="salary-input">
+                    <label> Monthly Salary:</label>
+                    <input type="number" id="salaryInput" placeholder="Enter your salary" step="0.01">
+                </div>
+                <button class="set-salary-btn" id="setSalaryBtn">Set Salary</button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="card">
+                <h3> Monthly Salary</h3>
+                <div class="amount" id="monthlySalary">$0</div>
+                <div class="sub">Your income this month</div>
+            </div>
+            <div class="card remaining-card">
+                <h3> Remaining Balance</h3>
+                <div class="amount" id="remainingBalance">$0</div>
+                <div class="sub">Left from your salary</div>
+            </div>
+            <div class="card">
+                <h3> Total Spent</h3>
+                <div class="amount" id="totalSpent">$0</div>
+                <div class="sub">Expenses this month</div>
+            </div>
+        </div>
+
+        <!-- Category Budgets -->
+        <div class="budget-section" id="budgetSection"></div>
+
+        <!-- Add Expense Form -->
+        <div class="form-section">
+            <h3 style="margin-bottom: 15px;"> Add New Expense</h3>
+            <div class="form-group">
+                <div class="input-field">
+                    <label>Description</label>
+                    <input type="text" id="expenseDesc" placeholder="e.g., Lunch, Coffee, Movie" autocomplete="off">
+                </div>
+                <div class="input-field">
+                    <label>Amount ($)</label>
+                    <input type="number" id="expenseAmount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="input-field">
+                    <label>Category</label>
+                    <select id="expenseCategory">
+                        <option value="Food"> Food</option>
+                        <option value="Outings"> Outings</option>
+                        <option value="Savings"> Savings</option>
+                        <option value="Other"> Other</option>
+                    </select>
+                </div>
+                <button class="add-btn" id="addExpenseBtn">+ Add Expense</button>
+            </div>
+        </div>
+
+        <!-- Transactions List -->
+        <div class="transactions-section">
+            <div class="transactions-header">
+                <h3> Transaction History</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="Food"> Food</button>
+                    <button class="filter-btn" data-filter="Outings"> Outings</button>
+                    <button class="filter-btn" data-filter="Savings"> Savings</button>
+                    <button class="filter-btn" data-filter="Other"> Other</button>
+                </div>
+                <button class="delete-all" id="deleteAllBtn"> Delete All</button>
+            </div>
+            <div id="transactionsList">
+                <div class="empty-message">No expenses yet. Add your first expense above!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure: Store data for each month separately
+        let allData = {};
+        let currentMonthKey = '';
+        let currentFilter = 'all';
+
+        // Category budgets (same for all months, but can be customized per month if needed)
+        let categoryBudgets = {
+            Food: 0,
+            Outings: 0,
+            Savings: 0,
+            Other: 0
+        };
+
+        // Get current month key (YYYY-MM)
+        function getCurrentMonthKey() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        // Format month display
+        function formatMonthDisplay(yearMonth) {
+            const [year, month] = yearMonth.split('-');
+            const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+            return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        }
+
+        // Get month data for current month
+        function getCurrentMonthData() {
+            if (!allData[currentMonthKey]) {
+                allData[currentMonthKey] = {
+                    salary: 0,
+                    expenses: [],
+                    budgets: { ...categoryBudgets }
+                };
+            }
+            return allData[currentMonthKey];
+        }
+
+        // Save all data to localStorage
+        function saveAllData() {
+            localStorage.setItem('expenseTrackerData', JSON.stringify(allData));
+            localStorage.setItem('categoryBudgets', JSON.stringify(categoryBudgets));
+        }
+
+        // Load all data from localStorage
+        function loadAllData() {
+            const savedData = localStorage.getItem('expenseTrackerData');
+            const savedBudgets = localStorage.getItem('categoryBudgets');
+            
+            if (savedData) {
+                allData = JSON.parse(savedData);
+            } else {
+                allData = {};
+            }
+            
+            if (savedBudgets) {
+                categoryBudgets = JSON.parse(savedBudgets);
+            }
+        }
+
+        // Get spent amount by category for current month
+        function getSpentByCategory() {
+            const monthData = getCurrentMonthData();
+            const spent = {
+                Food: 0,
+                Outings: 0,
+                Savings: 0,
+                Other: 0
+            };
+            monthData.expenses.forEach(exp => {
+                if (spent[exp.category] !== undefined) {
+                    spent[exp.category] += exp.amount;
+                }
+            });
+            return spent;
+        }
+
+        // Get total spent for current month
+        function getTotalSpent() {
+            const monthData = getCurrentMonthData();
+            return monthData.expenses.reduce((sum, exp) => sum + exp.amount, 0);
+        }
+
+        // Get remaining balance (salary - total spent)
+        function getRemainingBalance() {
+            const monthData = getCurrentMonthData();
+            return monthData.salary - getTotalSpent();
+        }
+
+        // Update UI
+        function updateUI() {
+            const monthData = getCurrentMonthData();
+            const salary = monthData.salary;
+            const totalSpent = getTotalSpent();
+            const remaining = getRemainingBalance();
+            
+            // Update summary cards
+            document.getElementById('monthlySalary').innerHTML = `$${salary.toFixed(2)}`;
+            document.getElementById('totalSpent').innerHTML = `$${totalSpent.toFixed(2)}`;
+            document.getElementById('remainingBalance').innerHTML = `$${remaining.toFixed(2)}`;
+            
+            // Change color if remaining is negative
+            const remainingElement = document.getElementById('remainingBalance');
+            if (remaining < 0) {
+                remainingElement.style.color = 'var(--danger)';
+            } else {
+                remainingElement.style.color = 'var(--success)';
+            }
+            
+            // Update budget cards
+            updateBudgetCards();
+            
+            // Update transactions list
+            updateTransactionsList();
+        }
+        
+        function updateBudgetCards() {
+            const spentByCat = getSpentByCategory();
+            const monthData = getCurrentMonthData();
+            const budgets = monthData.budgets;
+            
+            const budgetSection = document.getElementById('budgetSection');
+            budgetSection.innerHTML = '';
+            
+            const categories = ['Food', 'Outings', 'Savings', 'Other'];
+            const categoryIcons = { Food: '', Outings: '', Savings: '', Other: '' };
+            
+            categories.forEach(cat => {
+                const budget = budgets[cat] || 0;
+                const spent = spentByCat[cat];
+                const remainingCat = budget - spent;
+                const percentage = budget > 0 ? (spent / budget) * 100 : 0;
+                
+                let progressClass = '';
+                if (percentage >= 100) progressClass = 'danger';
+                else if (percentage >= 80) progressClass = 'warning';
+                
+                const card = document.createElement('div');
+                card.className = 'budget-card';
+                card.innerHTML = `
+                    <div class="budget-header">
+                        <span class="budget-title">${categoryIcons[cat]} ${cat}</span>
+                        <button class="edit-budget-btn" data-category="${cat}"> Set Limit</button>
+                    </div>
+                    <div class="budget-amount">$${spent.toFixed(2)} / $${budget.toFixed(2)}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${progressClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                    </div>
+                    <div class="budget-stats">
+                        <span> Left: $${Math.max(0, remainingCat).toFixed(2)}</span>
+                        <span>${percentage.toFixed(1)}% used</span>
+                    </div>
+                `;
+                budgetSection.appendChild(card);
+            });
+            
+            // Add edit budget listeners
+            document.querySelectorAll('.edit-budget-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const category = btn.dataset.category;
+                    const monthData = getCurrentMonthData();
+                    const currentBudget = monthData.budgets[category] || 0;
+                    const newBudget = prompt(`Set monthly limit for ${category}:`, currentBudget);
+                    if (newBudget !== null && !isNaN(parseFloat(newBudget)) && parseFloat(newBudget) >= 0) {
+                        monthData.budgets[category] = parseFloat(newBudget);
+                        saveAllData();
+                        updateUI();
+                    }
+                });
+            });
+        }
+        
+        function updateTransactionsList() {
+            const monthData = getCurrentMonthData();
+            let filteredExpenses = monthData.expenses;
+            
+            if (currentFilter !== 'all') {
+                filteredExpenses = monthData.expenses.filter(exp => exp.category === currentFilter);
+            }
+            
+            const container = document.getElementById('transactionsList');
+            
+            if (filteredExpenses.length === 0) {
+                container.innerHTML = '<div class="empty-message"> No expenses this month. Add your first expense above!</div>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sorted = [...filteredExpenses].reverse();
+            
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th></tr>
+                </thead>
+                <tbody id="transactionsTableBody"></tbody>
+            `;
+            
+            const tbody = table.querySelector('#transactionsTableBody');
+            
+            sorted.forEach((expense, idx) => {
+                const originalIndex = monthData.expenses.findIndex(e => e.id === expense.id);
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${escapeHtml(expense.description)}</td>
+                    <td>${getCategoryIcon(expense.category)} ${expense.category}</td>
+                    <td class="expense-row">-$${expense.amount.toFixed(2)}</td>
+                    <td>${expense.date}</td>
+                    <td><button class="delete-btn" data-index="${originalIndex}">Delete</button></td>
+                `;
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(table);
+            
+            // Add delete listeners
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(btn.dataset.index);
+                    const monthData = getCurrentMonthData();
+                    monthData.expenses.splice(index, 1);
+                    saveAllData();
+                    updateUI();
+                });
+            });
+        }
+        
+        function getCategoryIcon(category) {
+            const icons = { Food: '', Outings: '', Savings: '', Other: '' };
+            return icons[category] || '📌';
+        }
+        
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        // Set salary for current month
+        function setSalary() {
+            const salaryInput = document.getElementById('salaryInput');
+            const salary = parseFloat(salaryInput.value);
+            
+            if (isNaN(salary) || salary < 0) {
+                alert('Please enter a valid salary amount');
+                return;
+            }
+            
+            const monthData = getCurrentMonthData();
+            monthData.salary = salary;
+            saveAllData();
+            updateUI();
+            document.getElementById('salaryInput').value = '';
+        }
+        
+        // Add expense
+        function addExpense() {
+            const desc = document.getElementById('expenseDesc').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const category = document.getElementById('expenseCategory').value;
+            
+            if (!desc) {
+                alert('Please enter a description');
+                return;
+            }
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid amount greater than 0');
+                return;
+            }
+            
+            const monthData = getCurrentMonthData();
+            
+            const newExpense = {
+                id: Date.now(),
+                description: desc,
+                amount: amount,
+                category: category,
+                date: new Date().toLocaleDateString('en-US')
+            };
+            
+            monthData.expenses.push(newExpense);
+            saveAllData();
+            
+            // Clear form
+            document.getElementById('expenseDesc').value = '';
+            document.getElementById('expenseAmount').value = '';
+            
+            updateUI();
+        }
+        
+        function deleteAllExpenses() {
+            if (confirm('⚠️ Are you sure you want to delete ALL expenses for this month? This cannot be undone.')) {
+                const monthData = getCurrentMonthData();
+                monthData.expenses = [];
+                saveAllData();
+                updateUI();
+            }
+        }
+        
+        // Change month
+        function changeMonth(delta) {
+            const [year, month] = currentMonthKey.split('-');
+            let newYear = parseInt(year);
+            let newMonth = parseInt(month) + delta;
+            
+            if (newMonth > 12) {
+                newMonth = 1;
+                newYear++;
+            } else if (newMonth < 1) {
+                newMonth = 12;
+                newYear--;
+            }
+            
+            currentMonthKey = `${newYear}-${String(newMonth).padStart(2, '0')}`;
+            document.getElementById('currentMonthDisplay').textContent = formatMonthDisplay(currentMonthKey);
+            
+            // Load salary into input for quick edit
+            const monthData = getCurrentMonthData();
+            document.getElementById('salaryInput').value = monthData.salary || '';
+            
+            updateUI();
+        }
+        
+        // Dark Mode
+        function initDarkMode() {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) {
+                document.body.classList.add('dark');
+            }
+            document.getElementById('darkModeToggle').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+        }
+        
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', isDark);
+            document.getElementById('darkModeToggle').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+        }
+        
+        // Event Listeners
+        document.getElementById('addExpenseBtn').addEventListener('click', addExpense);
+        document.getElementById('deleteAllBtn').addEventListener('click', deleteAllExpenses);
+        document.getElementById('setSalaryBtn').addEventListener('click', setSalary);
+        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+        document.getElementById('prevMonth').addEventListener('click', () => changeMonth(-1));
+        document.getElementById('nextMonth').addEventListener('click', () => changeMonth(1));
+        
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                updateUI();
+            });
+        });
+        
+        // Enter key support
+        document.getElementById('expenseAmount').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addExpense();
+        });
+        document.getElementById('expenseDesc').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addExpense();
+        });
+        document.getElementById('salaryInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') setSalary();
+        });
+        
+        // Initialize
+        loadAllData();
+        currentMonthKey = getCurrentMonthKey();
+        document.getElementById('currentMonthDisplay').textContent = formatMonthDisplay(currentMonthKey);
+        
+        // Load current month salary into input
+        const monthData = getCurrentMonthData();
+        document.getElementById('salaryInput').value = monthData.salary || '';
+        
+        initDarkMode();
+        updateUI();
+    </script>
+</body>
+</html>
