@@ -1028,8 +1028,21 @@
 
             const recent = [...monthData.expenses].reverse().slice(0, 5);
             const recentDiv = document.getElementById('recentTransactions');
-            if (recent.length === 0) recentDiv.innerHTML = '<div style="text-align:center;padding:2rem;">No recent transactions</div>';
-            else recentDiv.innerHTML = `<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th> </thead><tbody>${recent.map(e => `tr <td>${escapeHtml(e.description)}</td><td>${e.category}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${e.date}</td></tr`).join('')}</tbody></table>`;
+            if (recent.length === 0) {
+                recentDiv.innerHTML = '<div style="text-align:center;padding:2rem;">No recent transactions</div>';
+            } else {
+                let tableHtml = '<table class="transactions-table"><thead><tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th></tr></thead><tbody>';
+                recent.forEach(e => {
+                    tableHtml += `<tr>
+                        <td>${escapeHtml(e.description)}</td>
+                        <td>${escapeHtml(e.category)}</td>
+                        <td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td>
+                        <td>${escapeHtml(e.date)}</td>
+                    </tr>`;
+                });
+                tableHtml += '</tbody></table>';
+                recentDiv.innerHTML = tableHtml;
+            }
 
             const pieData = categories.map(c => spentByCat[c]);
             if (pieChart) pieChart.destroy();
@@ -1055,10 +1068,16 @@
             if (currentFilter !== 'all') filtered = monthData.expenses.filter(e => e.category === currentFilter);
             const container = document.getElementById('expensesList');
             if (filtered.length === 0) { container.innerHTML = '<div style="text-align:center;padding:2rem;">No transactions</div>'; return; }
-            let html = '<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th></thead><tbody>';
+            let html = '<table class="transactions-table"><thead><tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th></tr></thead><tbody>';
             [...filtered].reverse().forEach(exp => {
                 const idx = monthData.expenses.findIndex(e => e.id === exp.id);
-                html += `<tr><td>${escapeHtml(exp.description)}</td><td>${exp.category}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${exp.date}</td><td><button class="delete-expense" data-idx="${idx}" style="color:white;background:var(--danger);padding:0.25rem 0.75rem;border-radius:0.5rem;">Delete</button></td></tr>`;
+                html += `<tr>
+                    <td>${escapeHtml(exp.description)}</td>
+                    <td>${escapeHtml(exp.category)}</td>
+                    <td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td>
+                    <td>${escapeHtml(exp.date)}</td>
+                    <td><button class="delete-expense" data-idx="${idx}" style="color:white;background:var(--danger);padding:0.25rem 0.75rem;border-radius:0.5rem;cursor:pointer;">Delete</button></td>
+                </tr>`;
             });
             html += '</tbody></table>';
             container.innerHTML = html;
@@ -1073,7 +1092,7 @@
                 const spent = card.spent || 0;
                 const limit = card.limit || 0;
                 const percent = limit > 0 ? (spent / limit) * 100 : 0;
-                grid.innerHTML += `<div class="card-item"><div style="display:flex;justify-content:space-between"><strong>${escapeHtml(card.name)}</strong><div><button class="edit-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button><button class="delete-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button></div></div><div>Limit: $${limit.toFixed(2)}</div><div>Spent: $${spent.toFixed(2)}</div><div class="progress-bar"><div class="progress-fill safe" style="width:${Math.min(percent,100)}%"></div></div><div>Remaining: $${(limit-spent).toFixed(2)}</div><div style="display:flex;gap:0.5rem;margin-top:0.75rem;"><input type="number" id="cardAmt_${idx}" placeholder="Amount" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;"><button class="card-spend" data-idx="${idx}" style="font-weight:700;border:none;background:var(--warning);padding:0.5rem;border-radius:0.75rem;">Spend</button><button class="card-pay" data-idx="${idx}" style="font-weight:700;border:none;background:var(--success);padding:0.5rem;border-radius:0.75rem;">Pay</button></div></div>`;
+                grid.innerHTML += `<div class="card-item"><div style="display:flex;justify-content:space-between"><strong>${escapeHtml(card.name)}</strong><div><button class="edit-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button><button class="delete-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button></div></div><div>Limit: $${limit.toFixed(2)}</div><div>Spent: $${spent.toFixed(2)}</div><div class="progress-bar"><div class="progress-fill safe" style="width:${Math.min(percent,100)}%"></div></div><div>Remaining: $${(limit-spent).toFixed(2)}</div><div style="display:flex;gap:0.5rem;margin-top:0.75rem;"><input type="number" id="cardAmt_${idx}" placeholder="Amount" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;"><button class="card-spend" data-idx="${idx}" style="font-weight:700;border:none;background:var(--warning);padding:0.5rem;border-radius:0.75rem;cursor:pointer;">Spend</button><button class="card-pay" data-idx="${idx}" style="font-weight:700;border:none;background:var(--success);padding:0.5rem;border-radius:0.75rem;cursor:pointer;">Pay</button></div></div>`;
             });
             document.querySelectorAll('.edit-card').forEach(btn => { btn.addEventListener('click', () => { const idx = parseInt(btn.dataset.idx); const newName = prompt('Card Name', appData.cards[idx].name); if(newName) appData.cards[idx].name = newName; const newLimit = parseFloat(prompt('Limit', appData.cards[idx].limit)); if(!isNaN(newLimit)) appData.cards[idx].limit = newLimit; saveToLocal(); renderCards(); updateAnalyticsPage(); }); });
             document.querySelectorAll('.delete-card').forEach(btn => { btn.addEventListener('click', () => { if(confirm('Delete card?')) { appData.cards.splice(parseInt(btn.dataset.idx), 1); saveToLocal(); renderCards(); updateAnalyticsPage(); } }); });
@@ -1214,7 +1233,7 @@
             
             const months = Object.keys(appData.expenses).sort().reverse().slice(0, 6);
             const perfDiv = document.getElementById('monthlyPerformance');
-            let perfHtml = '<table class="transactions-table"><thead><th>Month</th><th>Income</th><th>Expenses</th><th>Savings</th><th>Rate</th></thead><tbody>';
+            let perfHtml = '<table class="transactions-table"><thead><tr><th>Month</th><th>Income</th><th>Expenses</th><th>Savings</th><th>Rate</th></tr></thead><tbody>';
             months.forEach(month => { const data = appData.expenses[month]; const spent = data.expenses.reduce((s, e) => s + e.amount, 0); const saved = data.salary - spent; const rate = data.salary > 0 ? (saved / data.salary * 100) : 0; perfHtml += `<tr><td>${formatMonthDisplay(month).slice(0, 7)}</td><td>$${data.salary.toFixed(0)}</td><td style="color:var(--danger);">-$${spent.toFixed(0)}</td><td style="color:var(--success);">$${saved.toFixed(0)}</td><td>${rate.toFixed(1)}%</td></tr>`; });
             perfHtml += '</tbody></table>';
             perfDiv.innerHTML = perfHtml;
