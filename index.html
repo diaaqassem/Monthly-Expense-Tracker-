@@ -1029,7 +1029,7 @@
             const recent = [...monthData.expenses].reverse().slice(0, 5);
             const recentDiv = document.getElementById('recentTransactions');
             if (recent.length === 0) recentDiv.innerHTML = '<div style="text-align:center;padding:2rem;">No recent transactions</div>';
-            else recentDiv.innerHTML = `<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th> </thead><tbody>${recent.map(e => `tr<td>${escapeHtml(e.description)}</td><td>${e.category}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${e.date}</td></tr`).join('')}</tbody></table>`;
+            else recentDiv.innerHTML = `<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th> </thead><tbody>${recent.map(e => `tr <td>${escapeHtml(e.description)}</td><td>${e.category}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${e.date}</td></tr`).join('')}</tbody></table>`;
 
             const pieData = categories.map(c => spentByCat[c]);
             if (pieChart) pieChart.destroy();
