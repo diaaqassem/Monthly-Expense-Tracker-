@@ -560,7 +560,7 @@
             border-left: 3px solid var(--accent-primary);
         }
         input {
-            color; white;
+            color: white !important;
         }
 
         /* Goals */
@@ -934,7 +934,7 @@
                 const spent = card.spent || 0;
                 const limit = card.limit || 0;
                 const percent = limit > 0 ? (spent / limit) * 100 : 0;
-                grid.innerHTML += `<div class="card-item"><div style="display:flex;justify-content:space-between"><strong>${escapeHtml(card.name)}</strong><div><button class="edit-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button><button class="delete-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button></div></div><div>Limit: $${limit.toFixed(2)}</div><div>Spent: $${spent.toFixed(2)}</div><div class="progress-bar"><div class="progress-fill safe" style="width:${Math.min(percent,100)}%"></div></div><div>Remaining: $${(limit-spent).toFixed(2)}</div><div style="display:flex;gap:0.5rem;margin-top:0.75rem;"><input type="number" id="cardAmt_${idx}" placeholder="Amount" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;"><button class="card-spend" data-idx="${idx}" style="border:none;background:var(--warning);padding:0.5rem;border-radius:0.75rem;">Spend</button><button class="card-pay" data-idx="${idx}" style="border:none;background:var(--success);padding:0.5rem;border-radius:0.75rem;">Pay</button></div></div>`;
+                grid.innerHTML += `<div class="card-item"><div style="display:flex;justify-content:space-between"><strong>${escapeHtml(card.name)}</strong><div><button class="edit-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button><button class="delete-card" data-idx="${idx}" style="padding:4px;background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button></div></div><div>Limit: $${limit.toFixed(2)}</div><div>Spent: $${spent.toFixed(2)}</div><div class="progress-bar"><div class="progress-fill safe" style="width:${Math.min(percent,100)}%"></div></div><div>Remaining: $${(limit-spent).toFixed(2)}</div><div style="display:flex;gap:0.5rem;margin-top:0.75rem;"><input type="number" id="cardAmt_${idx}" placeholder="Amount" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;"><button class="card-spend" data-idx="${idx}" style="font-weight:700;border:none;background:var(--warning);padding:0.5rem;border-radius:0.75rem;">Spend</button><button class="card-pay" data-idx="${idx}" style="font-weight:700;border:none;background:var(--success);padding:0.5rem;border-radius:0.75rem;">Pay</button></div></div>`;
             });
             document.querySelectorAll('.edit-card').forEach(btn => { btn.addEventListener('click', () => { const idx = parseInt(btn.dataset.idx); const newName = prompt('Card Name', appData.cards[idx].name); if(newName) appData.cards[idx].name = newName; const newLimit = parseFloat(prompt('Limit', appData.cards[idx].limit)); if(!isNaN(newLimit)) appData.cards[idx].limit = newLimit; saveToLocal(); renderCards(); updateAnalyticsPage(); }); });
             document.querySelectorAll('.delete-card').forEach(btn => { btn.addEventListener('click', () => { if(confirm('Delete card?')) { appData.cards.splice(parseInt(btn.dataset.idx), 1); saveToLocal(); renderCards(); updateAnalyticsPage(); } }); });
