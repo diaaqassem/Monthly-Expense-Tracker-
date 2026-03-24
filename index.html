@@ -893,7 +893,7 @@
             const recent = [...monthData.expenses].reverse().slice(0, 5);
             const recentDiv = document.getElementById('recentTransactions');
             if (recent.length === 0) recentDiv.innerHTML = '<div style="text-align:center;padding:2rem;">No recent transactions</div>';
-            else recentDiv.innerHTML = `<table class="transactions-table"><thead>馋<th>Description</th><th>Category</th><th>Amount</th><th>Date</th> </thead><tbody>${recent.map(e => `tr<td>${escapeHtml(e.description)}</td><td>${e.category}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${e.date}</td></tr>`).join('')}</tbody> </table>`;
+            else recentDiv.innerHTML = `<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th> </thead><tbody>${recent.map(e => `tr<td>${escapeHtml(e.description)}</td><td>${e.category}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${e.date}</td></tr>`).join('')}</tbody> </table>`;
 
             const pieData = categories.map(c => spentByCat[c]);
             if (pieChart) pieChart.destroy();
@@ -922,7 +922,7 @@
             let html = '<table class="transactions-table"><thead><tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th></tr></thead><tbody>';
             [...filtered].reverse().forEach(exp => {
                 const idx = monthData.expenses.findIndex(e => e.id === exp.id);
-                html += `<tr><td>${escapeHtml(exp.description)}</td><td>${exp.category}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${exp.date}</td><td><button class="delete-expense" data-idx="${idx}" style="background:var(--danger);padding:0.25rem 0.75rem;border-radius:0.5rem;">Delete</button></td></tr>`;
+                html += `<tr><td>${escapeHtml(exp.description)}</td><td>${exp.category}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${exp.date}</td><td><button class="delete-expense" data-idx="${idx}" style="color:white;background:var(--danger);padding:0.25rem 0.75rem;border-radius:0.5rem;">Delete</button></td></tr>`;
             });
             html += '</tbody></table>';
             container.innerHTML = html;
