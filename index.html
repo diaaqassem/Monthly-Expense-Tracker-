@@ -1086,7 +1086,7 @@
             } else {
                 let tableHtml = '<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th></thead><tbody>';
                 recent.forEach(e => {
-                    tableHtml += `tr<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
+                    tableHtml += `<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
                 });
                 tableHtml += '</tbody></table>';
                 recentDiv.innerHTML = tableHtml;
