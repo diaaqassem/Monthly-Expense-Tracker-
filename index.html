@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
         button {
-            border:none !important;
+            border: none !important;
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
@@ -38,7 +38,6 @@
             --success: #00ff9d;
             --info: #00d4ff;
             --gradient-1: linear-gradient(135deg, #00ff9d, #00d4ff);
-            --gradient-2: linear-gradient(135deg, #bf7af0, #9b59b6);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
             --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.8);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.9);
@@ -63,6 +62,45 @@
             --text-muted: #8a9aa8;
             --border: #e2e8f0;
             --border-light: #eef2f6;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background: var(--surface);
+            border-left: 4px solid var(--accent-primary);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            backdrop-filter: blur(10px);
+        }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        .toast.info { border-left-color: var(--info); }
+        .toast-message { flex: 1; font-size: 0.85rem; }
+        .toast-close { cursor: pointer; font-size: 1.2rem; opacity: 0.7; transition: opacity 0.2s; }
+        .toast-close:hover { opacity: 1; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
 
         .login-overlay {
@@ -110,7 +148,6 @@
             padding: 1rem;
             background: var(--accent-primary);
             color: #000;
-            border: none;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -561,59 +598,15 @@
             padding: 1rem;
             margin-bottom: 1rem;
             border-left: 3px solid var(--accent-primary);
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-        .journal-checkbox {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            border-radius: 6px;
-            border: 2px solid var(--accent-primary);
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .journal-checkbox.completed {
-            background: var(--accent-primary);
-        }
-        .journal-checkbox.completed::after {
-            content: '✓';
-            color: #000;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .journal-content-wrapper {
-            flex: 1;
-        }
-        .journal-title {
-            font-weight: 700;
-            margin: 0 0 0.5rem 0;
-        }
-        .journal-title.completed {
-            text-decoration: line-through;
-            opacity: 0.6;
-        }
-        .journal-text {
-            margin-bottom: 0.5rem;
-        }
-        .journal-text.completed {
-            text-decoration: line-through;
-            opacity: 0.6;
         }
         .journal-date {
             color: var(--accent-primary);
             font-size: 0.7rem;
             margin-bottom: 0.25rem;
         }
-        .journal-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+        .journal-title {
+            font-weight: 700;
+            margin: 0.5rem 0;
         }
         .search-bar {
             margin-bottom: 1rem;
@@ -628,37 +621,19 @@
             border: 1px solid var(--border);
             border-radius: 1rem;
             color: var(--text-primary);
-            font-family: monospace;
-        }
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .filter-status-btn {
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: all 0.3s;
-        }
-        .filter-status-btn.active {
-            background: var(--accent-primary);
-            color: #000;
-            border-color: var(--accent-primary);
-        }
-        .task-counter {
-            background: var(--accent-primary);
-            color: #000;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.85rem;
-            font-weight: bold;
         }
         input { color: white !important; }
-        body.light input { color: #1a2c3e !important; }
+        body.light input { 
+            color: #1a2c3e !important;
+            width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    color: var(--text-primary);
+    transition: all 0.3s;
+        
+        }
 
         .goal-tracker {
             background: var(--bg-tertiary);
@@ -725,12 +700,13 @@
             .main-container { padding: 1rem; }
             .charts-container { grid-template-columns: 1fr; }
             .stat-value { font-size: 1.75rem; }
-            .journal-entry { flex-direction: column; }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
+    <div class="toast-container" id="toastContainer"></div>
+    
     <div class="login-overlay" id="loginOverlay">
         <div class="login-container">
             <div class="login-title"></div>
@@ -777,7 +753,7 @@
                         <button class="month-nav-btn" id="dashNextMonth">→</button>
                     </div>
                     <div style="display: flex; gap: 0.75rem;">
-                        <input type="number" id="dashSalaryInput" placeholder="Monthly Salary" step="0.01" style="padding: 0.75rem; background: var(--bg-tertiary); border-radius: 1rem; border: 1px solid var(--border);">
+                        <input type="number" id="dashSalaryInput" placeholder="Monthly Salary" step="0.01">
                         <button class="btn-primary" id="dashSetSalaryBtn">Set Salary</button>
                         <button class="btn-warning" id="setLimitsBtn">SET LIMITS</button>
                     </div>
@@ -807,7 +783,7 @@
                 <div class="form-card">
                     <h3 style="margin-bottom: 1rem;">Add Expense</h3>
                     <div class="form-row">
-                        <div class="input-group"><label>Description</label><input type="text" id="expenseDesc" placeholder="e.g., Groceries"></div>
+                        <div class="input-group"><label>Description</label><input type="text" id="expenseDesc"></div>
                         <div class="input-group"><label>Amount ($)</label><input type="number" id="expenseAmount" step="0.01"></div>
                         <div class="input-group"><label>Category</label><select id="expenseCategory"><option>Food & Dining</option><option>Entertainment</option><option>Transportation</option><option>Bills & Utilities</option><option>Shopping</option><option>Health</option><option>Education</option><option>Travel</option><option>Investments</option><option>Other</option></select></div>
                         <button class="btn-primary" id="addExpenseBtn">Add</button>
@@ -819,15 +795,17 @@
                         <div class="filter-group" id="expenseFilters"></div>
                         <button class="btn-danger" id="deleteAllExpensesBtn">Delete All</button>
                     </div>
-                    <div class="transactions-wrapper" id="expensesList"></div>
+                    <div id="expensesList"></div>
                 </div>
             </div>
 
             <div id="cardsPage" class="page">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
                     <h2>Banking Cards</h2>
-                    <button class="btn-primary" id="addCardBtn">Add Card</button>
-                    <button class="btn-primary" id="addPermanentCardBtn" style="background: var(--info);">Add Permanent Card</button>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="btn-primary" id="addCardBtn">Add Monthly Card</button>
+                        <button class="btn-primary" id="addPermanentCardBtn" style="background: var(--info);">Add Permanent Card</button>
+                    </div>
                 </div>
                 <div id="cardsGrid" class="cards-grid"></div>
                 <div class="glass-card" style="margin-top: 2rem;">
@@ -835,12 +813,12 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                         <div><div class="stat-label">Cash on Hand</div><div class="stat-value" id="cashAmount">$0</div></div>
                         <div style="display: flex; gap: 0.75rem;">
-                            <input type="number" id="cashInput" placeholder="Amount" step="0.01" style="padding: 0.75rem; background: var(--bg-tertiary); border-radius: 1rem;">
+                            <input type="number" id="cashInput" placeholder="Amount" step="0.01">
                             <button class="btn-primary" id="addCashBtn">Add</button>
                             <button class="btn-primary" id="withdrawCashBtn" style="background: var(--warning);">Withdraw</button>
                         </div>
                     </div>
-                    <div style="margin-top: 1rem;" id="cashHistory"></div>
+                    <div id="cashHistory" style="margin-top: 1rem;"></div>
                 </div>
             </div>
 
@@ -860,13 +838,13 @@
 
             <div id="journalPage" class="page">
                 <div class="form-card">
-                    <h3 style="margin-bottom: 1rem;">Create Note / Task</h3>
+                    <h3 style="margin-bottom: 1rem;">Create Note</h3>
                     <div class="form-row">
                         <div class="input-group"><label>Date</label><input type="date" id="journalDate"></div>
-                        <div class="input-group"><label>Title</label><input type="text" id="journalTitle" placeholder="Task title..."></div>
+                        <div class="input-group"><label>Title</label><input type="text" id="journalTitle"></div>
                         <div class="input-group"><label>Type</label><select id="journalType"><option value="monthly">Monthly Note</option><option value="permanent">Permanent Note</option></select></div>
                     </div>
-                    <div class="input-group" style="margin-top: 1rem;"><label>Content / Description</label><textarea id="journalContent" rows="4" placeholder="Write your task details..."></textarea></div>
+                    <div class="input-group" style="margin-top: 1rem;"><label>Content</label><textarea id="journalContent" rows="4"></textarea></div>
                     <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
                         <button class="btn-primary" id="addJournalBtn">Save Note</button>
                         <button class="btn-danger" id="deleteAllJournalBtn">Delete All</button>
@@ -874,18 +852,12 @@
                 </div>
                 <div class="glass-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                        <h3>All Notes & Tasks</h3>
-                        <div class="task-counter" id="taskCounter">Completed: 0 / 0</div>
-                    </div>
-                    <div class="search-bar">
-                        <input type="text" id="journalSearchInput" class="search-input" placeholder="Search by title or content...">
-                        <input type="date" id="journalDateSearch" class="search-input" placeholder="Search by date" style="width: 180px;">
-                        <div class="filter-buttons">
-                            <button class="filter-status-btn active" data-filter="all">All</button>
-                            <button class="filter-status-btn" data-filter="pending">Pending</button>
-                            <button class="filter-status-btn" data-filter="completed">Completed</button>
+                        <h3>All Notes</h3>
+                        <div class="search-bar">
+                            <input type="text" id="journalSearchInput" class="search-input" placeholder="Search by title or content...">
+                            <input type="date" id="journalDateSearch" class="search-input" placeholder="Search by date" style="width: 180px;">
+                            <button class="btn-primary" id="clearSearchBtn">Clear</button>
                         </div>
-                        <button class="btn-primary" id="clearSearchBtn">Clear</button>
                     </div>
                     <div id="journalList" class="journal-list"></div>
                 </div>
@@ -895,9 +867,9 @@
                 <div class="form-card">
                     <h3 style="margin-bottom: 1rem;">Set Financial Goal</h3>
                     <div class="form-row">
-                        <div class="input-group"><label>Goal Name</label><input type="text" id="goalName" placeholder="e.g., Emergency Fund"></div>
-                        <div class="input-group"><label>Target Amount</label><input type="number" id="goalTarget" step="0.01" placeholder="0.00"></div>
-                        <div class="input-group"><label>Current Saved</label><input type="number" id="goalCurrent" step="0.01" placeholder="0.00"></div>
+                        <div class="input-group"><label>Goal Name</label><input type="text" id="goalName"></div>
+                        <div class="input-group"><label>Target Amount</label><input type="number" id="goalTarget" step="0.01"></div>
+                        <div class="input-group"><label>Current Saved</label><input type="number" id="goalCurrent" step="0.01"></div>
                         <button class="btn-primary" id="addGoalBtn">Add Goal</button>
                     </div>
                 </div>
@@ -907,6 +879,29 @@
     </div>
 
     <script>
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="toast-message">${message}</span>
+                <span class="toast-close">×</span>
+            `;
+            container.appendChild(toast);
+            const closeBtn = toast.querySelector('.toast-close');
+            closeBtn.addEventListener('click', () => {
+                toast.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            });
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 3000);
+        }
+
         const VALID_USERNAME = "master";
         const VALID_PASSWORD = "1";
         let isAuthenticated = false;
@@ -929,9 +924,11 @@
                 isAuthenticated = true;
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('app').classList.add('authenticated');
+                showToast('Login successful! Welcome back.', 'success');
                 initApp();
             } else {
                 document.getElementById('loginError').innerText = 'INVALID CREDENTIALS';
+                showToast('Invalid username or password', 'error');
             }
         }
         
@@ -940,14 +937,14 @@
             isAuthenticated = false;
             document.getElementById('loginOverlay').style.display = 'flex';
             document.getElementById('app').classList.remove('authenticated');
+            showToast('Logged out successfully', 'info');
         }
         
-        let appData = { expenses: {}, cards: {}, permanentCards: [], cash: {}, journal: { monthly: {}, permanent: [] }, goals: [], lastMonth: '' };
+        let appData = { expenses: {}, cards: { monthly: {}, permanent: [] }, cash: {}, journal: { monthly: {}, permanent: [] }, goals: [] };
         let currentMonth = '';
         let currentFilter = 'all';
         let journalSearchQuery = '';
         let journalDateSearch = '';
-        let journalStatusFilter = 'all';
         let pieChart, trendChart, categoryChart, cashFlowChart;
         const categories = ['Food & Dining', 'Entertainment', 'Transportation', 'Bills & Utilities', 'Shopping', 'Health', 'Education', 'Travel', 'Investments', 'Other'];
         const defaultBudgets = {};
@@ -956,13 +953,13 @@
         function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; }
         function formatMonthDisplay(ym) { const [y, m] = ym.split('-'); return new Date(parseInt(y), parseInt(m) - 1, 1).toLocaleString('en-US', { month: 'long', year: 'numeric' }); }
         function getMonthData(monthKey) { if (!appData.expenses[monthKey]) appData.expenses[monthKey] = { salary: 0, expenses: [], budgets: { ...defaultBudgets } }; return appData.expenses[monthKey]; }
-        function getMonthCards() { if (!appData.cards[currentMonth]) appData.cards[currentMonth] = []; return appData.cards[currentMonth]; }
+        function getMonthCards() { if (!appData.cards.monthly[currentMonth]) appData.cards.monthly[currentMonth] = []; return appData.cards.monthly[currentMonth]; }
         function getMonthCash() { if (!appData.cash[currentMonth]) appData.cash[currentMonth] = { total: 0, history: [] }; return appData.cash[currentMonth]; }
         function getMonthlyNotes() { if (!appData.journal.monthly[currentMonth]) appData.journal.monthly[currentMonth] = []; return appData.journal.monthly[currentMonth]; }
         
         function saveToLocal() { 
             localStorage.setItem('nexus_finance_data', JSON.stringify(appData));
-            localStorage.setItem('nexus_last_month', currentMonth);
+            localStorage.setItem('nexus_current_month', currentMonth);
         }
         
         function loadFromLocal() { 
@@ -971,8 +968,9 @@
                 try {
                     const parsed = JSON.parse(saved); 
                     appData = parsed; 
-                    if (!appData.cards) appData.cards = {}; 
-                    if (!appData.permanentCards) appData.permanentCards = [];
+                    if (!appData.cards) appData.cards = { monthly: {}, permanent: [] };
+                    if (!appData.cards.monthly) appData.cards.monthly = {};
+                    if (!appData.cards.permanent) appData.cards.permanent = [];
                     if (!appData.cash) appData.cash = {}; 
                     if (!appData.journal) appData.journal = { monthly: {}, permanent: [] };
                     if (!appData.journal.monthly) appData.journal.monthly = {};
@@ -981,22 +979,29 @@
                     if (!appData.goals) appData.goals = [];
                 } catch(e) { console.error('Error loading data:', e); }
             }
-            const savedMonth = localStorage.getItem('nexus_last_month');
+            const savedMonth = localStorage.getItem('nexus_current_month');
             if (savedMonth) currentMonth = savedMonth;
+            else currentMonth = getCurrentMonthKey();
         }
         
         function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+
+        function updateMonthDisplay() {
+            const monthDisplay = formatMonthDisplay(currentMonth);
+            document.getElementById('dashMonthDisplay').innerText = monthDisplay;
+            document.getElementById('expMonthDisplay').innerText = monthDisplay;
+        }
 
         function updateDashboard() {
             const monthData = getMonthData(currentMonth);
             const totalSpent = monthData.expenses.reduce((s, e) => s + e.amount, 0);
             const remaining = monthData.salary - totalSpent;
             const savingsRate = monthData.salary > 0 ? (remaining / monthData.salary * 100) : 0;
+            
             document.getElementById('dashIncome').innerHTML = `$${monthData.salary.toFixed(2)}`;
             document.getElementById('dashExpenses').innerHTML = `$${totalSpent.toFixed(2)}`;
             document.getElementById('dashRemaining').innerHTML = `$${remaining.toFixed(2)}`;
             document.getElementById('dashSavingsRate').innerHTML = `${savingsRate.toFixed(1)}%`;
-            document.getElementById('dashMonthDisplay').innerText = formatMonthDisplay(currentMonth);
             document.getElementById('dashSalaryInput').value = monthData.salary || '';
 
             const spentByCat = {};
@@ -1017,10 +1022,13 @@
 
             const recent = [...monthData.expenses].reverse().slice(0, 5);
             const recentDiv = document.getElementById('recentTransactions');
-            if (recent.length === 0) recentDiv.innerHTML = '<div style="text-align:center;padding:2rem;">No recent transactions</div>';
-            else {
-                let tableHtml = '<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th></thead><tbody>';
-                recent.forEach(e => { tableHtml += `tr<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr`; });
+            if (recent.length === 0) {
+                recentDiv.innerHTML = '<div style="text-align:center;padding:2rem;">No recent transactions</div>';
+            } else {
+                let tableHtml = '<table class="transactions-table"><thead><tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th></tr></thead><tbody>';
+                recent.forEach(e => {
+                    tableHtml += `<tr><td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
+                });
                 tableHtml += '</tbody></table>';
                 recentDiv.innerHTML = tableHtml;
             }
@@ -1041,16 +1049,34 @@
             trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: months, datasets: [{ label: 'Expenses', data: trendData, borderColor: '#00ff9d', backgroundColor: 'rgba(0,255,157,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } } });
         }
 
+        function updateExpensesPage() {
+            const monthData = getMonthData(currentMonth);
+            let filtered = monthData.expenses;
+            if (currentFilter !== 'all') filtered = monthData.expenses.filter(e => e.category === currentFilter);
+            const container = document.getElementById('expensesList');
+            if (filtered.length === 0) { container.innerHTML = '<div style="text-align:center;padding:2rem;">No transactions</div>'; return; }
+            let html = '<table class="transactions-table"><thead><tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+            [...filtered].reverse().forEach(exp => {
+                const idx = monthData.expenses.findIndex(e => e.id === exp.id);
+                html += `<tr><td>${escapeHtml(exp.description)}</td><td>${escapeHtml(exp.category)}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${escapeHtml(exp.date)}</td><td><button class="delete-expense" data-idx="${idx}" style="color:white;background:var(--danger);padding:0.25rem 0.75rem;border-radius:0.5rem;cursor:pointer;">Delete</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            document.querySelectorAll('.delete-expense').forEach(btn => { btn.addEventListener('click', () => { getMonthData(currentMonth).expenses.splice(parseInt(btn.dataset.idx), 1); saveToLocal(); updateDashboard(); updateExpensesPage(); updateAnalyticsPage(); showToast('Expense deleted', 'warning'); }); });
+        }
+
         function renderCards() {
             const grid = document.getElementById('cardsGrid');
             if (!grid) return;
             const monthCards = getMonthCards();
-            const allCards = [...appData.permanentCards, ...monthCards];
+            const permanentCards = appData.cards.permanent || [];
+            const allCards = [...permanentCards.map(c => ({ ...c, isPermanent: true })), ...monthCards.map(c => ({ ...c, isPermanent: false }))];
             grid.innerHTML = '';
-            if (allCards.length === 0) { grid.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">No cards added. Click "Add Card" or "Add Permanent Card" to create one.</div>'; return; }
-            
+            if (allCards.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">No cards added. Click "Add Monthly Card" or "Add Permanent Card" to create one.</div>';
+                return;
+            }
             allCards.forEach((card, idx) => {
-                const isPermanent = card.isPermanent === true;
                 const spent = card.spent || 0;
                 const limit = card.limit || 0;
                 const percent = limit > 0 ? (spent / limit) * 100 : 0;
@@ -1065,10 +1091,10 @@
                 
                 grid.innerHTML += `<div class="card-item">
                     <div style="display:flex;justify-content:space-between; margin-bottom:0.75rem;">
-                        <strong style="font-size:1.1rem;">${isPermanent ? '📌 ' : ''}${escapeHtml(card.name)}</strong>
+                        <strong style="font-size:1.1rem;">${card.isPermanent ? '📌 ' : '📅 '}${escapeHtml(card.name)}</strong>
                         <div>
-                            <button class="edit-card" data-idx="${idx}" data-permanent="${isPermanent}" style="padding:4px 8px;background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button>
-                            <button class="delete-card" data-idx="${idx}" data-permanent="${isPermanent}" style="padding:4px 8px;background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button>
+                            <button class="edit-card" data-idx="${idx}" data-permanent="${card.isPermanent}" style="padding:4px 8px;background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button>
+                            <button class="delete-card" data-idx="${idx}" data-permanent="${card.isPermanent}" style="padding:4px 8px;background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button>
                         </div>
                     </div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
@@ -1081,10 +1107,10 @@
                         <span>${percent.toFixed(1)}% Used</span>
                     </div>
                     <div style="display:flex; gap:0.5rem; margin:0.75rem 0;">
-                        <input type="number" id="cardAmt_${idx}_${isPermanent}" placeholder="Amount" step="0.01" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;">
-                        <input type="datetime-local" id="cardDate_${idx}_${isPermanent}" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;">
-                        <button class="card-spend" data-idx="${idx}" data-permanent="${isPermanent}" style="font-weight:700;background:var(--warning);padding:0.5rem 0.75rem;border-radius:0.75rem;cursor:pointer;">Spend</button>
-                        <button class="card-pay" data-idx="${idx}" data-permanent="${isPermanent}" style="font-weight:700;background:var(--success);padding:0.5rem 0.75rem;border-radius:0.75rem;cursor:pointer;">Pay</button>
+                        <input type="number" id="cardAmt_${idx}_${card.isPermanent}" placeholder="Amount" step="0.01" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;">
+                        <input type="datetime-local" id="cardDate_${idx}_${card.isPermanent}" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;">
+                        <button class="card-spend" data-idx="${idx}" data-permanent="${card.isPermanent}" style="font-weight:700;background:var(--warning);padding:0.5rem 0.75rem;border-radius:0.75rem;cursor:pointer;">Spend</button>
+                        <button class="card-pay" data-idx="${idx}" data-permanent="${card.isPermanent}" style="font-weight:700;background:var(--success);padding:0.5rem 0.75rem;border-radius:0.75rem;cursor:pointer;">Pay</button>
                     </div>
                     ${transactionsHtml}
                 </div>`;
@@ -1092,16 +1118,16 @@
             
             document.querySelectorAll('.edit-card').forEach(btn => { btn.addEventListener('click', () => { 
                 const idx = parseInt(btn.dataset.idx); const isPermanent = btn.dataset.permanent === 'true';
-                let card; if (isPermanent) card = appData.permanentCards[idx]; else card = getMonthCards()[idx];
+                let card; if (isPermanent) card = appData.cards.permanent[idx]; else card = getMonthCards()[idx];
                 const newName = prompt('Card Name', card.name); if(newName) card.name = newName;
                 const newLimit = parseFloat(prompt('Limit', card.limit)); if(!isNaN(newLimit)) card.limit = newLimit;
-                saveToLocal(); renderCards(); updateAnalyticsPage(); 
+                saveToLocal(); renderCards(); updateAnalyticsPage(); showToast('Card updated', 'success');
             }); });
             document.querySelectorAll('.delete-card').forEach(btn => { btn.addEventListener('click', () => { if(confirm('Delete this card?')) { 
                 const idx = parseInt(btn.dataset.idx); const isPermanent = btn.dataset.permanent === 'true';
-                if (isPermanent) appData.permanentCards.splice(idx, 1);
+                if (isPermanent) appData.cards.permanent.splice(idx, 1);
                 else getMonthCards().splice(idx, 1);
-                saveToLocal(); renderCards(); updateAnalyticsPage(); 
+                saveToLocal(); renderCards(); updateAnalyticsPage(); showToast('Card deleted', 'warning');
             } }); });
             document.querySelectorAll('.card-spend').forEach(btn => { btn.addEventListener('click', () => { 
                 const idx = parseInt(btn.dataset.idx); const isPermanent = btn.dataset.permanent === 'true';
@@ -1109,11 +1135,11 @@
                 let date = document.getElementById(`cardDate_${idx}_${isPermanent}`).value;
                 if(!date) date = new Date().toLocaleString(); else date = date.replace('T', ' ');
                 if(amt > 0) { 
-                    let card; if (isPermanent) card = appData.permanentCards[idx]; else card = getMonthCards()[idx];
+                    let card; if (isPermanent) card = appData.cards.permanent[idx]; else card = getMonthCards()[idx];
                     card.spent = (card.spent || 0) + amt;
                     if(!card.transactions) card.transactions = [];
                     card.transactions.unshift({ date: date, amount: amt, type: 'spend' });
-                    saveToLocal(); renderCards(); updateAnalyticsPage(); 
+                    saveToLocal(); renderCards(); updateAnalyticsPage(); showToast(`Spent $${amt.toFixed(2)} on ${card.name}`, 'info');
                 }
             }); });
             document.querySelectorAll('.card-pay').forEach(btn => { btn.addEventListener('click', () => { 
@@ -1122,13 +1148,42 @@
                 let date = document.getElementById(`cardDate_${idx}_${isPermanent}`).value;
                 if(!date) date = new Date().toLocaleString(); else date = date.replace('T', ' ');
                 if(amt > 0) { 
-                    let card; if (isPermanent) card = appData.permanentCards[idx]; else card = getMonthCards()[idx];
+                    let card; if (isPermanent) card = appData.cards.permanent[idx]; else card = getMonthCards()[idx];
                     card.spent = Math.max(0, (card.spent || 0) - amt);
                     if(!card.transactions) card.transactions = [];
                     card.transactions.unshift({ date: date, amount: amt, type: 'payment' });
-                    saveToLocal(); renderCards(); updateAnalyticsPage(); 
+                    saveToLocal(); renderCards(); updateAnalyticsPage(); showToast(`Paid $${amt.toFixed(2)} on ${card.name}`, 'success');
                 }
             }); });
+        }
+
+        function updateCashUI() {
+            const monthCash = getMonthCash();
+            document.getElementById('cashAmount').innerHTML = `$${monthCash.total.toFixed(2)}`;
+            const historyDiv = document.getElementById('cashHistory');
+            if(historyDiv) {
+                let historyHtml = '<div class="transaction-history"><div class="transaction-item" style="color:var(--accent-primary);">Transaction History:</div>';
+                monthCash.history.slice().reverse().forEach(h => {
+                    const sign = h.type === 'add' ? '+' : '-';
+                    historyHtml += `<div class="transaction-item ${h.type === 'add' ? 'transaction-payment' : 'transaction-spend'}">${h.date}: ${sign}$${Math.abs(h.amount).toFixed(2)}</div>`;
+                });
+                if (monthCash.history.length === 0) historyHtml += '<div class="transaction-item">No transactions yet</div>';
+                historyHtml += '</div>';
+                historyDiv.innerHTML = historyHtml;
+            }
+        }
+
+        function addCash(amount, isAdd) { 
+            if(amount <= 0) return; 
+            const monthCash = getMonthCash();
+            if(!isAdd && monthCash.total < amount) { showToast('Insufficient cash', 'error'); return; }
+            const delta = isAdd ? amount : -amount; 
+            monthCash.total += delta; 
+            monthCash.history.unshift({ date: new Date().toLocaleString(), amount: delta, type: isAdd ? 'add' : 'withdraw' }); 
+            saveToLocal(); 
+            updateCashUI(); 
+            updateAnalyticsPage();
+            showToast(`${isAdd ? 'Added' : 'Withdrew'} $${amount.toFixed(2)} ${isAdd ? 'to' : 'from'} cash`, 'success');
         }
 
         function renderJournal() {
@@ -1136,7 +1191,7 @@
             if(!container) return;
             
             let monthlyNotes = getMonthlyNotes();
-            let allNotes = [...monthlyNotes, ...appData.journal.permanent];
+            let allNotes = [...monthlyNotes, ...(appData.journal.permanent || [])];
             allNotes = allNotes.map(n => ({ ...n, isPermanent: n.isPermanent || false }));
             
             if (journalSearchQuery.trim() !== '') {
@@ -1146,50 +1201,30 @@
             if (journalDateSearch) {
                 allNotes = allNotes.filter(note => note.date === journalDateSearch);
             }
-            if (journalStatusFilter === 'pending') allNotes = allNotes.filter(note => !note.completed);
-            else if (journalStatusFilter === 'completed') allNotes = allNotes.filter(note => note.completed);
-            
-            const totalTasks = allNotes.length;
-            const completedTasks = allNotes.filter(n => n.completed).length;
-            document.getElementById('taskCounter').innerHTML = `Completed: ${completedTasks} / ${totalTasks}`;
             
             if(allNotes.length === 0) { container.innerHTML = '<div style="text-align:center;padding:2rem;">No notes found</div>'; return; }
             
             container.innerHTML = '';
             [...allNotes].reverse().forEach(note => {
-                const isCompleted = note.completed || false;
                 container.innerHTML += `
                     <div class="journal-entry">
-                        <div class="journal-checkbox ${isCompleted ? 'completed' : ''}" data-id="${note.id}" data-permanent="${note.isPermanent}"></div>
-                        <div class="journal-content-wrapper">
-                            <div class="journal-date">${escapeHtml(note.date)} ${note.isPermanent ? ' Permanent' : ' Monthly'}</div>
-                            <div class="journal-title ${isCompleted ? 'completed' : ''}">${escapeHtml(note.title || 'Note')}</div>
-                            <div class="journal-text ${isCompleted ? 'completed' : ''}">${escapeHtml(note.content)}</div>
-                            <div class="journal-actions">
-                                <button class="edit-journal" data-id="${note.id}" data-permanent="${note.isPermanent}" style="background:var(--accent-primary);color:#000;padding:0.25rem 0.75rem;border-radius:0.5rem;cursor:pointer;">Edit</button>
-                                <button class="delete-journal" data-id="${note.id}" data-permanent="${note.isPermanent}" style="color:white;background:var(--danger);padding:0.25rem 0.75rem;border-radius:0.5rem;cursor:pointer;">Delete</button>
-                            </div>
+                        <div class="journal-date">${escapeHtml(note.date)} ${note.isPermanent ? '🔷 Permanent' : '📅 Monthly'}</div>
+                        <div class="journal-title">${escapeHtml(note.title || 'Note')}</div>
+                        <div>${escapeHtml(note.content)}</div>
+                        <div style="margin-top:0.5rem;">
+                            <button class="edit-journal" data-id="${note.id}" data-permanent="${note.isPermanent}" style="background:var(--accent-primary);color:#000;padding:0.25rem 0.75rem;border-radius:0.5rem;cursor:pointer;">Edit</button>
+                            <button class="delete-journal" data-id="${note.id}" data-permanent="${note.isPermanent}" style="color:white;background:var(--danger);padding:0.25rem 0.75rem;border-radius:0.5rem;cursor:pointer;margin-left:0.5rem;">Delete</button>
                         </div>
                     </div>
                 `;
             });
             
-            document.querySelectorAll('.journal-checkbox').forEach(btn => { 
-                btn.addEventListener('click', () => { 
-                    const id = parseInt(btn.dataset.id); const isPermanent = btn.dataset.permanent === 'true';
-                    let notes = isPermanent ? appData.journal.permanent : getMonthlyNotes();
-                    const noteIndex = notes.findIndex(n => n.id === id);
-                    if (noteIndex !== -1) { notes[noteIndex].completed = !notes[noteIndex].completed; saveToLocal(); renderJournal(); }
-                }); 
-            });
-            document.querySelectorAll('.delete-journal').forEach(btn => { 
-                btn.addEventListener('click', () => { 
-                    const id = parseInt(btn.dataset.id); const isPermanent = btn.dataset.permanent === 'true';
-                    if (isPermanent) appData.journal.permanent = appData.journal.permanent.filter(n => n.id !== id);
-                    else { const monthlyNotesArr = getMonthlyNotes(); const idx = monthlyNotesArr.findIndex(n => n.id === id); if(idx !== -1) monthlyNotesArr.splice(idx, 1); }
-                    saveToLocal(); renderJournal(); 
-                }); 
-            });
+            document.querySelectorAll('.delete-journal').forEach(btn => { btn.addEventListener('click', () => { 
+                const id = parseInt(btn.dataset.id); const isPermanent = btn.dataset.permanent === 'true';
+                if (isPermanent) appData.journal.permanent = appData.journal.permanent.filter(n => n.id !== id);
+                else { const monthlyNotesArr = getMonthlyNotes(); const idx = monthlyNotesArr.findIndex(n => n.id === id); if(idx !== -1) monthlyNotesArr.splice(idx, 1); }
+                saveToLocal(); renderJournal(); showToast('Note deleted', 'warning');
+            }); });
             document.querySelectorAll('.edit-journal').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = parseInt(btn.dataset.id); const isPermanent = btn.dataset.permanent === 'true';
@@ -1219,85 +1254,135 @@
                 const newContent = document.getElementById('editContent').value;
                 let notes = isPermanent ? appData.journal.permanent : getMonthlyNotes();
                 const noteIndex = notes.findIndex(n => n.id === noteId);
-                if (noteIndex !== -1) { notes[noteIndex].date = newDate; notes[noteIndex].title = newTitle || 'Note'; notes[noteIndex].content = newContent; saveToLocal(); renderJournal(); }
+                if (noteIndex !== -1) { notes[noteIndex].date = newDate; notes[noteIndex].title = newTitle || 'Note'; notes[noteIndex].content = newContent; saveToLocal(); renderJournal(); showToast('Note updated', 'success'); }
                 modal.remove();
             });
             document.getElementById('cancelEditBtn').addEventListener('click', () => modal.remove());
         }
 
+        function renderGoals() {
+            const container = document.getElementById('goalsList');
+            if (!container) return;
+            if (appData.goals.length === 0) { container.innerHTML = '<div style="text-align:center;padding:2rem;">No active goals</div>'; return; }
+            container.innerHTML = '';
+            appData.goals.forEach((goal, idx) => {
+                const percent = (goal.current / goal.target) * 100;
+                container.innerHTML += `
+                    <div class="goal-tracker">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="font-weight:600;">${escapeHtml(goal.name)}</span>
+                            <button class="delete-goal" data-idx="${idx}" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">Delete</button>
+                        </div>
+                        <div>$${goal.current.toFixed(2)} / $${goal.target.toFixed(2)}</div>
+                        <div class="goal-progress"><div style="width:${Math.min(percent,100)}%;height:100%;background:var(--success);"></div></div>
+                        <div>${percent.toFixed(1)}% Complete</div>
+                        <div style="margin-top:0.5rem;"><input type="number" id="goalUpdate_${idx}" placeholder="Add Amount" step="0.01" style="width:120px;background:var(--bg-tertiary);border:1px solid var(--border);padding:0.5rem;border-radius:0.5rem;"><button class="update-goal" data-idx="${idx}" style="background:var(--accent-primary);color:#000;border:none;padding:0.5rem 1rem;margin-left:0.5rem;border-radius:0.5rem;cursor:pointer;">Update</button></div>
+                    </div>
+                `;
+            });
+            document.querySelectorAll('.delete-goal').forEach(btn => { btn.addEventListener('click', () => { appData.goals.splice(parseInt(btn.dataset.idx), 1); saveToLocal(); renderGoals(); showToast('Goal deleted', 'warning'); }); });
+            document.querySelectorAll('.update-goal').forEach(btn => { btn.addEventListener('click', () => { const idx = parseInt(btn.dataset.idx); const add = parseFloat(document.getElementById(`goalUpdate_${idx}`).value); if(add > 0) { appData.goals[idx].current += add; saveToLocal(); renderGoals(); showToast(`Added $${add.toFixed(2)} to goal`, 'success'); } }); });
+        }
+
         function updateAnalyticsPage() {
             const monthCards = getMonthCards();
-            const totalCards = monthCards.length + appData.permanentCards.length;
-            const totalDebt = [...monthCards, ...appData.permanentCards].reduce((s, c) => s + (c.spent || 0), 0);
+            const permanentCards = appData.cards.permanent || [];
+            const totalCards = monthCards.length + permanentCards.length;
+            const totalDebt = [...monthCards, ...permanentCards].reduce((s, c) => s + (c.spent || 0), 0);
             document.getElementById('analyticsCards').innerText = totalCards;
             document.getElementById('analyticsDebt').innerHTML = `$${totalDebt.toFixed(2)}`;
+            
             let totalExpenses = 0, monthCount = 0;
             Object.keys(appData.expenses).forEach(key => { totalExpenses += appData.expenses[key].expenses.reduce((s, e) => s + e.amount, 0); monthCount++; });
             const avgSpend = monthCount > 0 ? totalExpenses / monthCount : 0;
             document.getElementById('analyticsAvgSpend').innerHTML = `$${avgSpend.toFixed(2)}`;
+            
             let bestMonth = { key: '', amount: Infinity };
             Object.keys(appData.expenses).forEach(key => { const spent = appData.expenses[key].expenses.reduce((s, e) => s + e.amount, 0); if (spent < bestMonth.amount) bestMonth = { key, amount: spent }; });
             document.getElementById('analyticsBestMonth').innerHTML = bestMonth.amount !== Infinity ? formatMonthDisplay(bestMonth.key).slice(0, 7) : '—';
+            
             const currentMonthData = getMonthData(currentMonth);
             const spentByCat = {}; categories.forEach(c => spentByCat[c] = 0);
             currentMonthData.expenses.forEach(e => { if (spentByCat[e.category] !== undefined) spentByCat[e.category] += e.amount; });
             if (categoryChart) categoryChart.destroy();
             categoryChart = new Chart(document.getElementById('categoryChart'), { type: 'bar', data: { labels: categories, datasets: [{ label: 'Spending', data: categories.map(c => spentByCat[c]), backgroundColor: '#00ff9d' }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } } });
+            
             const months = Object.keys(appData.expenses).sort().reverse().slice(0, 6);
             const perfDiv = document.getElementById('monthlyPerformance');
-            let perfHtml = '<table class="transactions-table"><thead><th>Month</th><th>Income</th><th>Expenses</th><th>Savings</th><th>Rate</th></thead><tbody>';
+            let perfHtml = '<table class="transactions-table"><thead><tr><th>Month</th><th>Income</th><th>Expenses</th><th>Savings</th><th>Rate</th></tr></thead><tbody>';
             months.forEach(month => { const data = appData.expenses[month]; const spent = data.expenses.reduce((s, e) => s + e.amount, 0); const saved = data.salary - spent; const rate = data.salary > 0 ? (saved / data.salary * 100) : 0; perfHtml += `<tr><td>${formatMonthDisplay(month).slice(0, 7)}</td><td>$${data.salary.toFixed(0)}</td><td style="color:var(--danger);">-$${spent.toFixed(0)}</td><td style="color:var(--success);">$${saved.toFixed(0)}</td><td>${rate.toFixed(1)}%</td></tr>`; });
             perfHtml += '</tbody></table>';
             perfDiv.innerHTML = perfHtml;
+            
             const cashFlowData = months.map(month => appData.expenses[month].expenses.reduce((s, e) => s + e.amount, 0)).reverse();
             if (cashFlowChart) cashFlowChart.destroy();
             cashFlowChart = new Chart(document.getElementById('cashFlowChart'), { type: 'line', data: { labels: months.map(m => formatMonthDisplay(m).slice(0, 7)).reverse(), datasets: [{ label: 'Monthly Cash Flow', data: cashFlowData, borderColor: '#00ff9d', fill: true, backgroundColor: 'rgba(0,255,157,0.1)' }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } } });
         }
 
+        function refreshAll() {
+            updateMonthDisplay();
+            updateDashboard();
+            updateExpensesPage();
+            renderCards();
+            updateCashUI();
+            renderJournal();
+            renderGoals();
+            updateAnalyticsPage();
+        }
+
+        function changeMonth(delta) {
+            let [y, m] = currentMonth.split('-');
+            let newM = parseInt(m) + delta;
+            let newY = parseInt(y);
+            if (newM > 12) { newM = 1; newY++; }
+            if (newM < 1) { newM = 12; newY--; }
+            currentMonth = `${newY}-${String(newM).padStart(2, '0')}`;
+            saveToLocal();
+            refreshAll();
+            showToast(`Changed to ${formatMonthDisplay(currentMonth)}`, 'info');
+        }
+
         function initApp() {
             loadFromLocal();
-            if (!currentMonth) currentMonth = getCurrentMonthKey();
-            updateDashboard();
-            renderCards();
-            renderJournal();
-            updateAnalyticsPage();
+            refreshAll();
             
-            document.getElementById('dashSetSalaryBtn').addEventListener('click', () => { const sal = parseFloat(document.getElementById('dashSalaryInput').value); if(!isNaN(sal)) { getMonthData(currentMonth).salary = sal; saveToLocal(); updateDashboard(); updateAnalyticsPage(); } });
+            const filterDiv = document.getElementById('expenseFilters');
+            ['all', ...categories].forEach(cat => { filterDiv.innerHTML += `<button class="filter-chip ${cat === 'all' ? 'active' : ''}" data-filter="${cat}">${cat === 'all' ? 'All' : cat}</button>`; });
+            document.querySelectorAll('#expenseFilters .filter-chip').forEach(btn => { btn.addEventListener('click', () => { currentFilter = btn.dataset.filter; document.querySelectorAll('#expenseFilters .filter-chip').forEach(b => b.classList.remove('active')); btn.classList.add('active'); updateExpensesPage(); }); });
+            
+            document.getElementById('dashSetSalaryBtn').addEventListener('click', () => { const sal = parseFloat(document.getElementById('dashSalaryInput').value); if(!isNaN(sal)) { getMonthData(currentMonth).salary = sal; saveToLocal(); updateDashboard(); updateAnalyticsPage(); showToast(`Salary set to $${sal.toFixed(2)}`, 'success'); } });
             document.getElementById('setLimitsBtn').addEventListener('click', () => { const monthData = getMonthData(currentMonth); const modal = document.createElement('div'); modal.className = 'limit-modal'; let html = '<div class="limit-modal-content"><h3>Set Category Budget Limits</h3>'; categories.forEach(cat => { html += `<div class="limit-item"><span>${cat}</span><input type="number" id="limit_${cat.replace(/ /g, '_')}" value="${monthData.budgets[cat] || 0}" step="0.01"></div>`; }); html += `<div class="modal-buttons"><button class="btn-primary" id="saveLimitsBtn">Save</button><button class="btn-danger" id="cancelLimitsBtn">Cancel</button></div></div>`; modal.innerHTML = html; document.body.appendChild(modal);
-            document.getElementById('saveLimitsBtn').addEventListener('click', () => { categories.forEach(cat => { const val = parseFloat(document.getElementById(`limit_${cat.replace(/ /g, '_')}`).value); if(!isNaN(val)) monthData.budgets[cat] = val; }); saveToLocal(); updateDashboard(); modal.remove(); });
+            document.getElementById('saveLimitsBtn').addEventListener('click', () => { categories.forEach(cat => { const val = parseFloat(document.getElementById(`limit_${cat.replace(/ /g, '_')}`).value); if(!isNaN(val)) monthData.budgets[cat] = val; }); saveToLocal(); updateDashboard(); modal.remove(); showToast('Budget limits updated', 'success'); });
             document.getElementById('cancelLimitsBtn').addEventListener('click', () => modal.remove()); });
             
-            document.getElementById('addExpenseBtn').addEventListener('click', () => { const desc = document.getElementById('expenseDesc').value.trim(); const amt = parseFloat(document.getElementById('expenseAmount').value); const cat = document.getElementById('expenseCategory').value; if(desc && amt > 0) { getMonthData(currentMonth).expenses.push({ id: Date.now(), description: desc, amount: amt, category: cat, date: new Date().toLocaleDateString() }); saveToLocal(); updateDashboard(); updateAnalyticsPage(); document.getElementById('expenseDesc').value = ''; document.getElementById('expenseAmount').value = ''; } });
-            document.getElementById('deleteAllExpensesBtn').addEventListener('click', () => { if(confirm('Delete all expenses?')) { getMonthData(currentMonth).expenses = []; saveToLocal(); updateDashboard(); updateAnalyticsPage(); } });
+            document.getElementById('addExpenseBtn').addEventListener('click', () => { const desc = document.getElementById('expenseDesc').value.trim(); const amt = parseFloat(document.getElementById('expenseAmount').value); const cat = document.getElementById('expenseCategory').value; if(desc && amt > 0) { getMonthData(currentMonth).expenses.push({ id: Date.now(), description: desc, amount: amt, category: cat, date: new Date().toLocaleDateString() }); saveToLocal(); updateDashboard(); updateExpensesPage(); updateAnalyticsPage(); document.getElementById('expenseDesc').value = ''; document.getElementById('expenseAmount').value = ''; showToast(`Added expense: $${amt.toFixed(2)} for ${desc}`, 'info'); } });
+            document.getElementById('deleteAllExpensesBtn').addEventListener('click', () => { if(confirm('Delete all expenses?')) { getMonthData(currentMonth).expenses = []; saveToLocal(); updateDashboard(); updateExpensesPage(); updateAnalyticsPage(); showToast('All expenses deleted', 'warning'); } });
             
-            const monthNav = (delta) => { let [y,m] = currentMonth.split('-'); let newM = parseInt(m)+delta, newY = parseInt(y); if(newM>12){newM=1;newY++;} if(newM<1){newM=12;newY--;} currentMonth = `${newY}-${String(newM).padStart(2,'0')}`; saveToLocal(); updateDashboard(); renderCards(); updateAnalyticsPage(); renderJournal(); };
-            document.getElementById('dashPrevMonth').addEventListener('click', () => monthNav(-1));
-            document.getElementById('dashNextMonth').addEventListener('click', () => monthNav(1));
-            document.getElementById('expPrevMonth').addEventListener('click', () => monthNav(-1));
-            document.getElementById('expNextMonth').addEventListener('click', () => monthNav(1));
+            document.getElementById('dashPrevMonth').addEventListener('click', () => changeMonth(-1));
+            document.getElementById('dashNextMonth').addEventListener('click', () => changeMonth(1));
+            document.getElementById('expPrevMonth').addEventListener('click', () => changeMonth(-1));
+            document.getElementById('expNextMonth').addEventListener('click', () => changeMonth(1));
             
-            document.getElementById('addCardBtn').addEventListener('click', () => { const name = prompt('Card Name'); if(name) { const limit = parseFloat(prompt('Limit', '1000')); getMonthCards().push({ id: Date.now(), name, limit: isNaN(limit)?0:limit, spent: 0, transactions: [], isPermanent: false }); saveToLocal(); renderCards(); updateAnalyticsPage(); } });
-            document.getElementById('addPermanentCardBtn').addEventListener('click', () => { const name = prompt('Permanent Card Name'); if(name) { const limit = parseFloat(prompt('Limit', '1000')); appData.permanentCards.push({ id: Date.now(), name, limit: isNaN(limit)?0:limit, spent: 0, transactions: [], isPermanent: true }); saveToLocal(); renderCards(); updateAnalyticsPage(); } });
-            document.getElementById('addCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt) && amt > 0) { const monthCash = getMonthCash(); monthCash.total += amt; monthCash.history.unshift({ date: new Date().toLocaleString(), amount: amt, type: 'add' }); saveToLocal(); updateAnalyticsPage(); document.getElementById('cashInput').value = ''; const cashDiv = document.getElementById('cashAmount'); if(cashDiv) cashDiv.innerHTML = `$${monthCash.total.toFixed(2)}`; const historyDiv = document.getElementById('cashHistory'); if(historyDiv) historyDiv.innerHTML = monthCash.history.slice(0,5).map(h => `<div>${h.date}: +$${h.amount.toFixed(2)}</div>`).join(''); } });
-            document.getElementById('withdrawCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt) && amt > 0) { const monthCash = getMonthCash(); if(monthCash.total >= amt) { monthCash.total -= amt; monthCash.history.unshift({ date: new Date().toLocaleString(), amount: amt, type: 'withdraw' }); saveToLocal(); updateAnalyticsPage(); document.getElementById('cashInput').value = ''; const cashDiv = document.getElementById('cashAmount'); if(cashDiv) cashDiv.innerHTML = `$${monthCash.total.toFixed(2)}`; const historyDiv = document.getElementById('cashHistory'); if(historyDiv) historyDiv.innerHTML = monthCash.history.slice(0,5).map(h => `<div>${h.date}: -$${h.amount.toFixed(2)}</div>`).join(''); } else alert('Insufficient cash'); } });
-            
-            document.getElementById('addJournalBtn').addEventListener('click', () => { const date = document.getElementById('journalDate').value; const title = document.getElementById('journalTitle').value.trim(); const content = document.getElementById('journalContent').value.trim(); const type = document.getElementById('journalType').value; if(content) { const newNote = { id: Date.now(), date: date || new Date().toISOString().split('T')[0], title: title || 'Note', content, completed: false, isPermanent: type === 'permanent' }; if (type === 'permanent') appData.journal.permanent.push(newNote); else getMonthlyNotes().push(newNote); saveToLocal(); renderJournal(); document.getElementById('journalTitle').value = ''; document.getElementById('journalContent').value = ''; } });
-            document.getElementById('deleteAllJournalBtn').addEventListener('click', () => { if(confirm('Delete all notes?')) { appData.journal.monthly[currentMonth] = []; appData.journal.permanent = []; saveToLocal(); renderJournal(); } });
+            document.getElementById('addCardBtn').addEventListener('click', () => { const name = prompt('Card Name'); if(name) { const limit = parseFloat(prompt('Limit', '1000')); getMonthCards().push({ id: Date.now(), name, limit: isNaN(limit)?0:limit, spent: 0, transactions: [], isPermanent: false }); saveToLocal(); renderCards(); updateAnalyticsPage(); showToast(`Monthly card "${name}" added`, 'success'); } });
+            document.getElementById('addPermanentCardBtn').addEventListener('click', () => { const name = prompt('Permanent Card Name'); if(name) { const limit = parseFloat(prompt('Limit', '1000')); appData.cards.permanent.push({ id: Date.now(), name, limit: isNaN(limit)?0:limit, spent: 0, transactions: [], isPermanent: true }); saveToLocal(); renderCards(); updateAnalyticsPage(); showToast(`Permanent card "${name}" added`, 'success'); } });
+            document.getElementById('addCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt)) addCash(amt, true); document.getElementById('cashInput').value = ''; });
+            document.getElementById('withdrawCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt)) addCash(amt, false); document.getElementById('cashInput').value = ''; });
+            document.getElementById('addJournalBtn').addEventListener('click', () => { const date = document.getElementById('journalDate').value; const title = document.getElementById('journalTitle').value.trim(); const content = document.getElementById('journalContent').value.trim(); const type = document.getElementById('journalType').value; if(content) { const newNote = { id: Date.now(), date: date || new Date().toISOString().split('T')[0], title: title || 'Note', content, isPermanent: type === 'permanent' }; if (type === 'permanent') appData.journal.permanent.push(newNote); else getMonthlyNotes().push(newNote); saveToLocal(); renderJournal(); document.getElementById('journalTitle').value = ''; document.getElementById('journalContent').value = ''; showToast(`${type === 'permanent' ? 'Permanent' : 'Monthly'} note saved`, 'success'); } });
+            document.getElementById('deleteAllJournalBtn').addEventListener('click', () => { if(confirm('Delete all notes?')) { appData.journal.monthly[currentMonth] = []; appData.journal.permanent = []; saveToLocal(); renderJournal(); showToast('All notes deleted', 'warning'); } });
             
             const searchInput = document.getElementById('journalSearchInput');
             searchInput.addEventListener('input', (e) => { journalSearchQuery = e.target.value; renderJournal(); });
             const dateSearch = document.getElementById('journalDateSearch');
             dateSearch.addEventListener('change', (e) => { journalDateSearch = e.target.value; renderJournal(); });
-            document.getElementById('clearSearchBtn').addEventListener('click', () => { searchInput.value = ''; dateSearch.value = ''; journalSearchQuery = ''; journalDateSearch = ''; renderJournal(); });
-            document.querySelectorAll('.filter-status-btn').forEach(btn => { btn.addEventListener('click', () => { document.querySelectorAll('.filter-status-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); journalStatusFilter = btn.dataset.filter; renderJournal(); }); });
+            document.getElementById('clearSearchBtn').addEventListener('click', () => { searchInput.value = ''; dateSearch.value = ''; journalSearchQuery = ''; journalDateSearch = ''; renderJournal(); showToast('Search cleared', 'info'); });
             
-            document.getElementById('addGoalBtn').addEventListener('click', () => { const name = document.getElementById('goalName').value.trim(); const target = parseFloat(document.getElementById('goalTarget').value); const current = parseFloat(document.getElementById('goalCurrent').value) || 0; if(name && target > 0) { appData.goals.push({ id: Date.now(), name, target, current }); saveToLocal(); const goalsDiv = document.getElementById('goalsList'); if(goalsDiv) { goalsDiv.innerHTML = ''; appData.goals.forEach((goal, idx) => { const percent = (goal.current / goal.target) * 100; goalsDiv.innerHTML += `<div class="goal-tracker"><div style="display:flex;justify-content:space-between;"><span style="font-weight:600;">${escapeHtml(goal.name)}</span><button class="delete-goal" data-idx="${idx}" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">Delete</button></div><div>$${goal.current.toFixed(2)} / $${goal.target.toFixed(2)}</div><div class="goal-progress"><div style="width:${Math.min(percent,100)}%;height:100%;background:var(--success);"></div></div><div>${percent.toFixed(1)}% Complete</div><div style="margin-top:0.5rem;"><input type="number" id="goalUpdate_${idx}" placeholder="Add Amount" step="0.01" style="width:120px;background:var(--bg-tertiary);border:1px solid var(--border);padding:0.5rem;border-radius:0.5rem;"><button class="update-goal" data-idx="${idx}" style="background:var(--accent-primary);color:#000;border:none;padding:0.5rem 1rem;margin-left:0.5rem;border-radius:0.5rem;cursor:pointer;">Update</button></div></div>`; }); document.querySelectorAll('.delete-goal').forEach(btn => { btn.addEventListener('click', () => { appData.goals.splice(parseInt(btn.dataset.idx), 1); saveToLocal(); updateAnalyticsPage(); document.getElementById('addGoalBtn').click(); }); }); document.querySelectorAll('.update-goal').forEach(btn => { btn.addEventListener('click', () => { const idx = parseInt(btn.dataset.idx); const add = parseFloat(document.getElementById(`goalUpdate_${idx}`).value); if(add > 0) { appData.goals[idx].current += add; saveToLocal(); updateAnalyticsPage(); document.getElementById('addGoalBtn').click(); } }); }); } document.getElementById('goalName').value = ''; document.getElementById('goalTarget').value = ''; document.getElementById('goalCurrent').value = ''; } });
+            document.getElementById('addGoalBtn').addEventListener('click', () => { const name = document.getElementById('goalName').value.trim(); const target = parseFloat(document.getElementById('goalTarget').value); const current = parseFloat(document.getElementById('goalCurrent').value) || 0; if(name && target > 0) { appData.goals.push({ id: Date.now(), name, target, current }); saveToLocal(); renderGoals(); document.getElementById('goalName').value = ''; document.getElementById('goalTarget').value = ''; document.getElementById('goalCurrent').value = ''; showToast(`Goal "${name}" added`, 'success'); } });
             
-            document.getElementById('exportBtn').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(appData, null, 2)], {type:'application/json'})); a.download = `nexus_backup_${new Date().toISOString().slice(0,19)}.json`; a.click(); });
+            document.getElementById('exportBtn').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(appData, null, 2)], {type:'application/json'})); a.download = `nexus_backup_${new Date().toISOString().slice(0,19)}.json`; a.click(); showToast('Data exported successfully', 'success'); });
             document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
-            document.getElementById('importFile').addEventListener('change', (e) => { if(e.target.files.length) { const reader = new FileReader(); reader.onload = (ev) => { try { appData = JSON.parse(ev.target.result); saveToLocal(); location.reload(); } catch(err) { alert('Invalid file'); } }; reader.readAsText(e.target.files[0]); } });
-            document.getElementById('resetBtn').addEventListener('click', () => { if(confirm('Reset all data?')) { localStorage.removeItem('nexus_finance_data'); localStorage.removeItem('nexus_last_month'); location.reload(); } });
-            document.getElementById('themeToggle').addEventListener('click', () => { document.body.classList.toggle('light'); localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark'); document.getElementById('themeToggle').innerHTML = document.body.classList.contains('light') ? 'DARK MODE' : 'LIGHT MODE'; });
+            document.getElementById('importFile').addEventListener('change', (e) => { if(e.target.files.length) { const reader = new FileReader(); reader.onload = (ev) => { try { appData = JSON.parse(ev.target.result); saveToLocal(); location.reload(); showToast('Data imported successfully', 'success'); } catch(err) { showToast('Invalid file', 'error'); } }; reader.readAsText(e.target.files[0]); } });
+            document.getElementById('resetBtn').addEventListener('click', () => { if(confirm('Reset all data?')) { localStorage.removeItem('nexus_finance_data'); localStorage.removeItem('nexus_current_month'); location.reload(); } });
+            document.getElementById('themeToggle').addEventListener('click', () => { document.body.classList.toggle('light'); localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark'); document.getElementById('themeToggle').innerHTML = document.body.classList.contains('light') ? 'DARK MODE' : 'LIGHT MODE'; showToast(`Switched to ${document.body.classList.contains('light') ? 'light' : 'dark'} mode`, 'info'); });
             document.querySelectorAll('.tab').forEach(btn => { btn.addEventListener('click', () => { document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(`${btn.dataset.page}Page`).classList.add('active'); if(btn.dataset.page === 'analytics') updateAnalyticsPage(); if(btn.dataset.page === 'cards') renderCards(); if(btn.dataset.page === 'journal') renderJournal(); }); });
             
             document.getElementById('journalDate').value = new Date().toISOString().split('T')[0];
@@ -1308,6 +1393,7 @@
         document.getElementById('logoutBtn').addEventListener('click', logout);
         document.getElementById('loginUsername').addEventListener('keypress', (e) => { if(e.key === 'Enter') login(); });
         document.getElementById('loginPassword').addEventListener('keypress', (e) => { if(e.key === 'Enter') login(); });
+        
         checkAuth();
     </script>
 </body>
