@@ -1081,7 +1081,24 @@
         }
         
         function saveToLocal() { localStorage.setItem('nexus_finance_data', JSON.stringify(appData)); }
-        function loadFromLocal() { const saved = localStorage.getItem('nexus_finance_data'); if (saved) { const parsed = JSON.parse(saved); appData = parsed; if (!appData.cards) appData.cards = {}; if (!appData.cash) appData.cash = {}; if (!appData.journal) appData.journal = []; if (!appData.expenses) appData.expenses = {}; if (!appData.goals) appData.goals = []; } }
+        function loadFromLocal() { 
+            const saved = localStorage.getItem('nexus_finance_data'); 
+            if (saved) { 
+                try {
+                    const parsed = JSON.parse(saved); 
+                    appData = parsed; 
+                    if (!appData.cards) appData.cards = {}; 
+                    if (!appData.cash) appData.cash = {}; 
+                    if (!appData.journal) appData.journal = []; 
+                    if (!appData.expenses) appData.expenses = {}; 
+                    if (!appData.goals) appData.goals = [];
+                    // Ensure all months have card arrays
+                    if (appData.cards && typeof appData.cards === 'object') {
+                        // Keep as is - cards are stored per month key
+                    }
+                } catch(e) { console.error('Error loading data:', e); }
+            } 
+        }
         function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
 
         function openLimitsModal() {
@@ -1166,7 +1183,7 @@
             } else {
                 let tableHtml = '<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th></thead><tbody>';
                 recent.forEach(e => {
-                    tableHtml += `<tr><td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
+                    tableHtml += `tr<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
                 });
                 tableHtml += '</tbody></table>';
                 recentDiv.innerHTML = tableHtml;
@@ -1211,6 +1228,10 @@
             if (!grid) return;
             const monthCards = getMonthCards();
             grid.innerHTML = '';
+            if (monthCards.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">No cards added for this month. Click "Add Card" to create one.</div>';
+                return;
+            }
             monthCards.forEach((card, idx) => {
                 const spent = card.spent || 0;
                 const limit = card.limit || 0;
@@ -1286,7 +1307,6 @@
             updateAnalyticsPage(); 
         }
 
-        // Toggle note completion status
         function toggleNoteCompletion(noteId) {
             const noteIndex = appData.journal.findIndex(n => n.id === noteId);
             if (noteIndex !== -1) {
@@ -1302,7 +1322,6 @@
             
             let filteredNotes = appData.journal;
             
-            // Apply search filter
             if (journalSearchQuery.trim() !== '') {
                 const query = journalSearchQuery.toLowerCase();
                 filteredNotes = filteredNotes.filter(note => 
@@ -1311,7 +1330,6 @@
                 );
             }
             
-            // Apply status filter
             if (journalStatusFilter === 'pending') {
                 filteredNotes = filteredNotes.filter(note => !note.completed);
             } else if (journalStatusFilter === 'completed') {
@@ -1487,13 +1505,40 @@
             document.getElementById('addExpenseBtn').addEventListener('click', () => { const desc = document.getElementById('expenseDesc').value.trim(); const amt = parseFloat(document.getElementById('expenseAmount').value); const cat = document.getElementById('expenseCategory').value; if(desc && amt > 0) { getMonthData(currentMonth).expenses.push({ id: Date.now(), description: desc, amount: amt, category: cat, date: new Date().toLocaleDateString() }); saveToLocal(); updateDashboard(); updateExpensesPage(); updateAnalyticsPage(); document.getElementById('expenseDesc').value = ''; document.getElementById('expenseAmount').value = ''; } });
             document.getElementById('deleteAllExpensesBtn').addEventListener('click', () => { if(confirm('Delete all expenses?')) { getMonthData(currentMonth).expenses = []; saveToLocal(); updateDashboard(); updateExpensesPage(); updateAnalyticsPage(); } });
             
-            const monthNav = (delta) => { let [y,m] = currentMonth.split('-'); let newM = parseInt(m)+delta, newY = parseInt(y); if(newM>12){newM=1;newY++;} if(newM<1){newM=12;newY--;} currentMonth = `${newY}-${String(newM).padStart(2,'0')}`; updateDashboard(); updateExpensesPage(); renderCards(); updateCashUI(); updateAnalyticsPage(); };
+            const monthNav = (delta) => { 
+                let [y,m] = currentMonth.split('-'); 
+                let newM = parseInt(m)+delta, newY = parseInt(y); 
+                if(newM>12){newM=1;newY++;} 
+                if(newM<1){newM=12;newY--;} 
+                currentMonth = `${newY}-${String(newM).padStart(2,'0')}`; 
+                updateDashboard(); 
+                updateExpensesPage(); 
+                renderCards(); 
+                updateCashUI(); 
+                updateAnalyticsPage(); 
+            };
             document.getElementById('dashPrevMonth').addEventListener('click', () => monthNav(-1));
             document.getElementById('dashNextMonth').addEventListener('click', () => monthNav(1));
             document.getElementById('expPrevMonth').addEventListener('click', () => monthNav(-1));
             document.getElementById('expNextMonth').addEventListener('click', () => monthNav(1));
             
-            document.getElementById('addCardBtn').addEventListener('click', () => { const name = prompt('Card Name'); if(name) { const limit = parseFloat(prompt('Limit', '1000')); const monthCards = getMonthCards(); monthCards.push({ id: Date.now(), name, limit: isNaN(limit)?0:limit, spent: 0, transactions: [] }); saveToLocal(); renderCards(); updateAnalyticsPage(); } });
+            document.getElementById('addCardBtn').addEventListener('click', () => { 
+                const name = prompt('Card Name'); 
+                if(name) { 
+                    const limit = parseFloat(prompt('Limit', '1000')); 
+                    const monthCards = getMonthCards(); 
+                    monthCards.push({ 
+                        id: Date.now(), 
+                        name, 
+                        limit: isNaN(limit)?0:limit, 
+                        spent: 0, 
+                        transactions: [] 
+                    }); 
+                    saveToLocal(); 
+                    renderCards(); 
+                    updateAnalyticsPage(); 
+                } 
+            });
             document.getElementById('addCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt)) addCash(amt, true); document.getElementById('cashInput').value = ''; });
             document.getElementById('withdrawCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt)) addCash(amt, false); document.getElementById('cashInput').value = ''; });
             document.getElementById('addJournalBtn').addEventListener('click', () => { const date = document.getElementById('journalDate').value; const title = document.getElementById('journalTitle').value.trim(); const content = document.getElementById('journalContent').value.trim(); if(content) { appData.journal.push({ id: Date.now(), date: date || new Date().toISOString().split('T')[0], title: title || 'Note', content, completed: false }); saveToLocal(); renderJournal(); document.getElementById('journalTitle').value = ''; document.getElementById('journalContent').value = ''; } });
