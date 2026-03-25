@@ -766,12 +766,14 @@
         const VALID_USERNAME = "master";
         const VALID_PASSWORD = "1";
         
-        // Main Data Structure
+        // Main Data Structure with clear separation
         let appData = {
+            version: "2.0",
+            lastUpdated: new Date().toISOString(),
             expenses: {},
             cards: {
-                permanent: [],      // Permanent cards (appear in all months)
-                monthly: {}         // Monthly cards (key: YYYY-MM)
+                permanent: [],      // Array of permanent cards (always visible)
+                monthly: {}         // Object with month keys, each containing array of monthly cards
             },
             cash: {},
             journal: {
@@ -807,17 +809,19 @@
             return appData.expenses[monthKey]; 
         }
         
-        function getMonthCards() { 
+        // Get monthly cards for current month
+        function getMonthlyCards() { 
             if (!appData.cards.monthly[currentMonth]) {
                 appData.cards.monthly[currentMonth] = [];
             }
             return appData.cards.monthly[currentMonth]; 
         }
         
-        function getAllCardsForCurrentMonth() {
-            const monthlyCards = getMonthCards();
+        // Get all cards (permanent + monthly for current month)
+        function getAllCards() {
+            const monthlyCards = getMonthlyCards();
             const permanentCards = appData.cards.permanent || [];
-            return [...permanentCards.map(c => ({ ...c, type: 'permanent' })), ...monthlyCards.map(c => ({ ...c, type: 'monthly' }))];
+            return [...permanentCards, ...monthlyCards];
         }
         
         function getMonthCash() { 
@@ -836,9 +840,11 @@
         
         function saveToLocal() { 
             try {
-                localStorage.setItem('nexus_finance_data', JSON.stringify(appData));
+                appData.lastUpdated = new Date().toISOString();
+                const dataToSave = JSON.stringify(appData);
+                localStorage.setItem('nexus_finance_data', dataToSave);
                 localStorage.setItem('nexus_current_month', currentMonth);
-                console.log('Data saved successfully');
+                console.log('Data saved successfully. Cards:', getAllCards().length);
                 return true;
             } catch(e) {
                 console.error('Error saving:', e);
@@ -863,8 +869,14 @@
                     if (!appData.journal.monthly) appData.journal.monthly = {};
                     if (!appData.expenses) appData.expenses = {};
                     if (!appData.goals) appData.goals = [];
-                    console.log('Data loaded, permanent cards:', appData.cards.permanent.length);
+                    console.log('Data loaded. Permanent cards:', appData.cards.permanent.length);
+                    console.log('Monthly cards for current month:', appData.cards.monthly[currentMonth]?.length || 0);
                 } catch(e) { console.error('Error loading:', e); }
+            } else {
+                console.log('No saved data found, initializing fresh data');
+                // Initialize with demo permanent card
+                appData.cards.permanent = [];
+                appData.cards.monthly = {};
             }
             const savedMonth = localStorage.getItem('nexus_current_month');
             if (savedMonth) currentMonth = savedMonth;
@@ -918,7 +930,7 @@
             } else {
                 let tableHtml = '<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th></thead><tbody>';
                 recent.forEach(e => {
-                    tableHtml += `<tr><td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
+                    tableHtml += `tr<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
                 });
                 tableHtml += '</tbody></table>';
                 recentDiv.innerHTML = tableHtml;
@@ -959,7 +971,7 @@
         function renderCards() {
             const grid = document.getElementById('cardsGrid');
             if (!grid) return;
-            const allCards = getAllCardsForCurrentMonth();
+            const allCards = getAllCards();
             grid.innerHTML = '';
             
             if (allCards.length === 0) {
@@ -971,7 +983,8 @@
                 const spent = card.spent || 0;
                 const limit = card.limit || 0;
                 const percent = limit > 0 ? (spent / limit) * 100 : 0;
-                const isPermanent = card.type === 'permanent';
+                const isPermanent = card.isPermanent === true;
+                const source = isPermanent ? 'permanent' : 'monthly';
                 
                 let transactionsHtml = '<div class="transaction-history"><div class="transaction-item" style="color:var(--accent-primary);">Transaction History:</div>';
                 (card.transactions || []).slice().reverse().forEach(t => {
@@ -986,8 +999,8 @@
                     <div style="display:flex;justify-content:space-between; margin-bottom:0.75rem;">
                         <strong style="font-size:1.1rem;">${isPermanent ? '📌 ' : '📅 '}${escapeHtml(card.name)}</strong>
                         <div>
-                            <button class="edit-card" data-idx="${idx}" data-permanent="${isPermanent}" style="background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button>
-                            <button class="delete-card" data-idx="${idx}" data-permanent="${isPermanent}" style="background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button>
+                            <button class="edit-card" data-idx="${idx}" data-permanent="${isPermanent}" data-source="${source}" style="background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button>
+                            <button class="delete-card" data-idx="${idx}" data-permanent="${isPermanent}" data-source="${source}" style="background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button>
                         </div>
                     </div>
                     <div>Limit: $${limit.toFixed(2)}</div>
@@ -997,8 +1010,8 @@
                     <div style="display:flex; gap:0.5rem; margin:0.75rem 0;">
                         <input type="number" id="cardAmt_${idx}_${isPermanent}" placeholder="Amount" step="0.01" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;">
                         <input type="datetime-local" id="cardDate_${idx}_${isPermanent}" style="flex:1;background:var(--bg-tertiary);border-radius:0.75rem;padding:0.5rem;">
-                        <button class="card-spend" data-idx="${idx}" data-permanent="${isPermanent}" style="background:var(--warning);padding:0.5rem 0.75rem;border-radius:0.75rem;">Spend</button>
-                        <button class="card-pay" data-idx="${idx}" data-permanent="${isPermanent}" style="background:var(--success);padding:0.5rem 0.75rem;border-radius:0.75rem;">Pay</button>
+                        <button class="card-spend" data-idx="${idx}" data-permanent="${isPermanent}" data-source="${source}" style="background:var(--warning);padding:0.5rem 0.75rem;border-radius:0.75rem;">Spend</button>
+                        <button class="card-pay" data-idx="${idx}" data-permanent="${isPermanent}" data-source="${source}" style="background:var(--success);padding:0.5rem 0.75rem;border-radius:0.75rem;">Pay</button>
                     </div>
                     ${transactionsHtml}
                 </div>`;
@@ -1010,7 +1023,7 @@
                 const isPermanent = btn.dataset.permanent === 'true';
                 let card;
                 if (isPermanent) card = appData.cards.permanent[idx];
-                else card = getMonthCards()[idx];
+                else card = getMonthlyCards()[idx];
                 const newName = prompt('Card Name', card.name); 
                 if(newName) card.name = newName;
                 const newLimit = parseFloat(prompt('Limit', card.limit)); 
@@ -1023,8 +1036,11 @@
                 if(confirm('Delete this card?')) { 
                     const idx = parseInt(btn.dataset.idx); 
                     const isPermanent = btn.dataset.permanent === 'true';
-                    if (isPermanent) appData.cards.permanent.splice(idx, 1);
-                    else getMonthCards().splice(idx, 1);
+                    if (isPermanent) {
+                        appData.cards.permanent.splice(idx, 1);
+                    } else {
+                        getMonthlyCards().splice(idx, 1);
+                    }
                     if(saveToLocal()) { renderCards(); updateAnalyticsPage(); showToast('Card deleted', 'warning'); }
                 }
             }); });
@@ -1040,7 +1056,7 @@
                 if(amt > 0) { 
                     let card;
                     if (isPermanent) card = appData.cards.permanent[idx];
-                    else card = getMonthCards()[idx];
+                    else card = getMonthlyCards()[idx];
                     card.spent = (card.spent || 0) + amt;
                     if(!card.transactions) card.transactions = [];
                     card.transactions.unshift({ date: date, amount: amt, type: 'spend' });
@@ -1059,7 +1075,7 @@
                 if(amt > 0) { 
                     let card;
                     if (isPermanent) card = appData.cards.permanent[idx];
-                    else card = getMonthCards()[idx];
+                    else card = getMonthlyCards()[idx];
                     card.spent = Math.max(0, (card.spent || 0) - amt);
                     if(!card.transactions) card.transactions = [];
                     card.transactions.unshift({ date: date, amount: amt, type: 'payment' });
@@ -1199,7 +1215,7 @@
         }
 
         function updateAnalyticsPage() {
-            const allCards = getAllCardsForCurrentMonth();
+            const allCards = getAllCards();
             const totalCards = allCards.length;
             const totalDebt = allCards.reduce((s, c) => s + (c.spent || 0), 0);
             document.getElementById('analyticsCards').innerText = totalCards;
@@ -1278,8 +1294,49 @@
             document.getElementById('expPrevMonth').addEventListener('click', () => changeMonth(-1));
             document.getElementById('expNextMonth').addEventListener('click', () => changeMonth(1));
             
-            document.getElementById('addCardBtn').addEventListener('click', () => { const name = prompt('Card Name'); if(name) { const limit = parseFloat(prompt('Limit', '1000')); const monthCards = getMonthCards(); monthCards.push({ id: Date.now(), name, limit: isNaN(limit)?0:limit, spent: 0, transactions: [] }); saveToLocal(); renderCards(); updateAnalyticsPage(); showToast(`Monthly card "${name}" added`, 'success'); } });
-            document.getElementById('addPermanentCardBtn').addEventListener('click', () => { const name = prompt('Permanent Card Name'); if(name) { const limit = parseFloat(prompt('Limit', '1000')); appData.cards.permanent.push({ id: Date.now(), name, limit: isNaN(limit)?0:limit, spent: 0, transactions: [] }); saveToLocal(); renderCards(); updateAnalyticsPage(); showToast(`Permanent card "${name}" added`, 'success'); } });
+            document.getElementById('addCardBtn').addEventListener('click', () => { 
+                const name = prompt('Card Name'); 
+                if(name) { 
+                    const limit = parseFloat(prompt('Limit', '1000')); 
+                    const monthlyCards = getMonthlyCards(); 
+                    monthlyCards.push({ 
+                        id: Date.now(), 
+                        name: name, 
+                        limit: isNaN(limit) ? 0 : limit, 
+                        spent: 0, 
+                        transactions: [],
+                        isPermanent: false,
+                        createdAt: new Date().toISOString()
+                    }); 
+                    if(saveToLocal()) { 
+                        renderCards(); 
+                        updateAnalyticsPage(); 
+                        showToast(`Monthly card "${name}" added`, 'success'); 
+                    }
+                } 
+            });
+            
+            document.getElementById('addPermanentCardBtn').addEventListener('click', () => { 
+                const name = prompt('Permanent Card Name'); 
+                if(name) { 
+                    const limit = parseFloat(prompt('Limit', '1000')); 
+                    appData.cards.permanent.push({ 
+                        id: Date.now(), 
+                        name: name, 
+                        limit: isNaN(limit) ? 0 : limit, 
+                        spent: 0, 
+                        transactions: [],
+                        isPermanent: true,
+                        createdAt: new Date().toISOString()
+                    }); 
+                    if(saveToLocal()) { 
+                        renderCards(); 
+                        updateAnalyticsPage(); 
+                        showToast(`Permanent card "${name}" added`, 'success'); 
+                    }
+                } 
+            });
+            
             document.getElementById('addCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt)) addCash(amt, true); document.getElementById('cashInput').value = ''; });
             document.getElementById('withdrawCashBtn').addEventListener('click', () => { const amt = parseFloat(document.getElementById('cashInput').value); if(!isNaN(amt)) addCash(amt, false); document.getElementById('cashInput').value = ''; });
             document.getElementById('addJournalBtn').addEventListener('click', () => { const date = document.getElementById('journalDate').value; const title = document.getElementById('journalTitle').value.trim(); const content = document.getElementById('journalContent').value.trim(); const type = document.getElementById('journalType').value; if(content) { const newNote = { id: Date.now(), date: date || new Date().toISOString().split('T')[0], title: title || 'Note', content, isPermanent: type === 'permanent' }; if (type === 'permanent') appData.journal.permanent.push(newNote); else getMonthlyNotes().push(newNote); saveToLocal(); renderJournal(); document.getElementById('journalTitle').value = ''; document.getElementById('journalContent').value = ''; showToast(`${type === 'permanent' ? 'Permanent' : 'Monthly'} note saved`, 'success'); } });
