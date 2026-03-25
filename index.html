@@ -692,7 +692,7 @@
                         <button class="month-nav-btn" id="dashNextMonth">→</button>
                     </div>
                     <div style="display: flex; gap: 0.75rem;">
-                        <input type="number" id="dashSalaryInput" placeholder="Monthly Salary" step="0.01">
+                        <input type="number" id="dashSalaryInput" placeholder="Monthly Salary" step="0.01" style="width: 100%;padding: 0.75rem 1rem;background: var(--bg-tertiary);border: 1px solid var(--border);border-radius: 1rem;color: var(--text-primary);transition: all 0.3s;">
                         <button class="btn-primary" id="dashSetSalaryBtn">Set Salary</button>
                         <button class="btn-warning" id="setLimitsBtn">SET LIMITS</button>
                     </div>
@@ -752,7 +752,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                         <div><div class="stat-label">Cash on Hand</div><div class="stat-value" id="cashAmount">$0</div></div>
                         <div style="display: flex; gap: 0.75rem;">
-                            <input type="number" id="cashInput" placeholder="Amount" step="0.01">
+                            <input type="number" id="cashInput" placeholder="Amount" step="0.01" style="width: 100%;padding: 0.75rem 1rem;background: var(--bg-tertiary);border: 1px solid var(--border);border-radius: 1rem;color: var(--text-primary);transition: all 0.3s;">
                             <button class="btn-primary" id="addCashBtn">Add</button>
                             <button class="btn-primary" id="withdrawCashBtn" style="background: var(--warning);">Withdraw</button>
                         </div>
@@ -1048,7 +1048,7 @@
                 
                 grid.innerHTML += `<div class="card-item">
                     <div style="display:flex;justify-content:space-between; margin-bottom:0.75rem;">
-                        <strong style="font-size:1.1rem;">${isPermanent ? '📌 ' : '📅 '}${escapeHtml(card.name)}</strong>
+                        <strong style="font-size:1.1rem;">${isPermanent ? ' ' : ' '}${escapeHtml(card.name)}</strong>
                         <div>
                             <button class="edit-card" data-idx="${idx}" data-permanent="${isPermanent}" style="background:none;border:none;cursor:pointer;color:var(--accent-primary);">Edit</button>
                             <button class="delete-card" data-idx="${idx}" data-permanent="${isPermanent}" style="background:none;border:none;cursor:pointer;color:var(--danger);">Delete</button>
@@ -1190,7 +1190,7 @@
                     <div class="journal-entry">
                         <div class="journal-checkbox ${isCompleted ? 'completed' : ''}" data-id="${note.id}" data-permanent="${isPermanent}"></div>
                         <div class="journal-content-wrapper">
-                            <div class="journal-date">${escapeHtml(note.date)} ${isPermanent ? '🔷 Permanent' : '📅 Monthly'}</div>
+                            <div class="journal-date">${escapeHtml(note.date)} ${isPermanent ? ' Permanent' : ' Monthly'}</div>
                             <div class="journal-title ${isCompleted ? 'completed' : ''}">${escapeHtml(note.title || 'Note')}</div>
                             <div class="journal-text ${isCompleted ? 'completed' : ''}">${escapeHtml(note.content)}</div>
                             <div class="journal-actions">
