@@ -798,6 +798,11 @@
                     <div class="search-bar">
                         <input type="text" id="journalSearchInput" class="search-input" placeholder="Search by title or content...">
                         <input type="date" id="journalDateSearch" class="search-input" placeholder="Search by date" style="width: 180px;">
+                        <div class="filter-buttons" style="display: flex; gap: 0.5rem;">
+                            <button class="filter-chip note-filter active" data-note-filter="all">All</button>
+                            <button class="filter-chip note-filter" data-note-filter="completed">Completed</button>
+                            <button class="filter-chip note-filter" data-note-filter="uncompleted">Uncompleted</button>
+                        </div>
                         <button class="btn-primary" id="clearSearchBtn">Clear</button>
                     </div>
                     <div id="journalList" class="journal-list"></div>
@@ -853,6 +858,7 @@
         let currentFilter = 'all';
         let journalSearchQuery = '';
         let journalDateSearch = '';
+        let journalNoteFilter = 'all';
         let pieChart, trendChart, categoryChart, cashFlowChart;
         const categories = ['Food & Dining', 'Entertainment', 'Transportation', 'Bills & Utilities', 'Shopping', 'Health', 'Education', 'Travel', 'Investments', 'Other'];
         const defaultBudgets = {};
@@ -983,7 +989,7 @@
             } else {
                 let tableHtml = '<table class="transactions-table"><thead><th>Description</th><th>Category</th><th>Amount</th><th>Date</th></thead><tbody>';
                 recent.forEach(e => {
-                    tableHtml += `<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
+                    tableHtml += `tr<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
                 });
                 tableHtml += '</tbody></table>';
                 recentDiv.innerHTML = tableHtml;
@@ -1168,12 +1174,20 @@
             let monthlyNotes = getMonthlyNotes();
             let allNotes = [...monthlyNotes, ...(appData.journal.permanent || [])];
             
+            // Apply search filter
             if (journalSearchQuery.trim() !== '') {
                 const query = journalSearchQuery.toLowerCase();
                 allNotes = allNotes.filter(note => (note.title || '').toLowerCase().includes(query) || (note.content || '').toLowerCase().includes(query));
             }
+            // Apply date filter
             if (journalDateSearch) {
                 allNotes = allNotes.filter(note => note.date === journalDateSearch);
+            }
+            // Apply completion status filter
+            if (journalNoteFilter === 'completed') {
+                allNotes = allNotes.filter(note => note.completed === true);
+            } else if (journalNoteFilter === 'uncompleted') {
+                allNotes = allNotes.filter(note => note.completed !== true);
             }
             
             // Calculate task counter
@@ -1349,6 +1363,16 @@
             const filterDiv = document.getElementById('expenseFilters');
             ['all', ...categories].forEach(cat => { filterDiv.innerHTML += `<button class="filter-chip ${cat === 'all' ? 'active' : ''}" data-filter="${cat}">${cat === 'all' ? 'All' : cat}</button>`; });
             document.querySelectorAll('#expenseFilters .filter-chip').forEach(btn => { btn.addEventListener('click', () => { currentFilter = btn.dataset.filter; document.querySelectorAll('#expenseFilters .filter-chip').forEach(b => b.classList.remove('active')); btn.classList.add('active'); updateExpensesPage(); }); });
+            
+            // Note filter buttons
+            document.querySelectorAll('.note-filter').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.note-filter').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    journalNoteFilter = btn.dataset.noteFilter;
+                    renderJournal();
+                });
+            });
             
             document.getElementById('dashSetSalaryBtn').addEventListener('click', () => { const sal = parseFloat(document.getElementById('dashSalaryInput').value); if(!isNaN(sal)) { getMonthData(currentMonth).salary = sal; saveToLocal(); updateDashboard(); updateAnalyticsPage(); showToast(`Salary set to $${sal.toFixed(2)}`, 'success'); } });
             document.getElementById('setLimitsBtn').addEventListener('click', () => { const monthData = getMonthData(currentMonth); const modal = document.createElement('div'); modal.className = 'limit-modal'; let html = '<div class="limit-modal-content"><h3>Set Category Budget Limits</h3>'; categories.forEach(cat => { html += `<div class="limit-item"><span>${cat}</span><input type="number" id="limit_${cat.replace(/ /g, '_')}" value="${monthData.budgets[cat] || 0}" step="0.01"></div>`; }); html += `<div class="modal-buttons"><button class="btn-primary" id="saveLimitsBtn">Save</button><button class="btn-danger" id="cancelLimitsBtn">Cancel</button></div></div>`; modal.innerHTML = html; document.body.appendChild(modal);
