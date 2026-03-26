@@ -579,8 +579,8 @@
             max-width: 500px;
         }
         .limit-modal .limit-item {
-            margin: .2rem 0;
-            padding: 0.5rem;
+            margin: 1rem 0;
+            padding: 0.75rem;
             background: var(--bg-tertiary);
             border-radius: 0.75rem;
             display: flex;
@@ -631,8 +631,74 @@
             cursor: pointer;
         }
 
+        /* Edit Modal Styles - Fixed Input Styling */
+        .edit-modal .edit-modal-content {
+            background: var(--surface);
+            border: 1px solid var(--accent-primary);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+        }
+        .edit-modal .edit-modal-content h3 {
+            margin-bottom: 1.5rem;
+            color: var(--accent-primary);
+        }
+        .edit-modal .edit-modal-content label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        .edit-modal .edit-modal-content input,
+        .edit-modal .edit-modal-content textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+        .edit-modal .edit-modal-content input:focus,
+        .edit-modal .edit-modal-content textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        .edit-modal .edit-modal-content textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .edit-modal .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+        .edit-modal .btn-primary {
+            background: var(--accent-primary);
+            color: #000;
+            font-weight: 700;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+        }
+        .edit-modal .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
-            /* .header-content { padding: 12px; } */
             .main-container { padding: 1rem; }
             .stat-value { font-size: 1.75rem; }
             .cards-grid { grid-template-columns: 1fr; }
@@ -1014,7 +1080,7 @@
             } else {
                 let html = '<table class="transactions-table"><thead> <th>Description</th><th>Category</th><th>Amount</th><th>Date</th> </thead><tbody>';
                 recent.forEach(e => {
-                    html += `<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
+                    html += `tr<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
                 });
                 html += '</tbody></table>';
                 recentDiv.innerHTML = html;
@@ -1300,10 +1366,16 @@
                         modal.className = 'edit-modal';
                         modal.innerHTML = `<div class="edit-modal-content">
                             <h3>Edit Note</h3>
-                            <label>Date</label><input type="date" id="editDate" value="${note.date}">
-                            <label>Title</label><input type="text" id="editTitle" value="${escapeHtml(note.title)}">
-                            <label>Content</label><textarea id="editContent" rows="4">${escapeHtml(note.content)}</textarea>
-                            <div class="modal-buttons"><button class="btn-primary" id="saveEdit">Save</button><button class="btn-danger" id="cancelEdit">Cancel</button></div>
+                            <label>Date</label>
+                            <input type="date" id="editDate" value="${note.date}">
+                            <label>Title</label>
+                            <input type="text" id="editTitle" value="${escapeHtml(note.title)}">
+                            <label>Content</label>
+                            <textarea id="editContent" rows="4">${escapeHtml(note.content)}</textarea>
+                            <div class="modal-buttons">
+                                <button class="btn-primary" id="saveEdit">Save Changes</button>
+                                <button class="btn-danger" id="cancelEdit">Cancel</button>
+                            </div>
                         </div>`;
                         document.body.appendChild(modal);
                         document.getElementById('saveEdit').onclick = () => {
@@ -1472,7 +1544,7 @@
                 const rate = d.salary > 0 ? (saved / d.salary * 100) : 0;
                 html += `tr<td>${formatMonthDisplay(m).slice(0, 7)}</td><td>$${d.salary.toFixed(0)}</td><td style="color:var(--danger);">-$${spent.toFixed(0)}</td><td style="color:var(--success);">$${saved.toFixed(0)}</td><td>${rate.toFixed(1)}%</td></tr>`;
             });
-            html += '</tbody></table>';
+            html += '</tbody> </table>';
             perfDiv.innerHTML = html;
             
             const cashFlowData = months.map(m => appData.expenses[m].expenses.reduce((s, e) => s + e.amount, 0)).reverse();
@@ -1498,9 +1570,9 @@
             let html = '<table class="transactions-table"><thead> <th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th> </thead><tbody>';
             [...filtered].reverse().forEach(exp => {
                 const idx = monthData.expenses.findIndex(e => e.id === exp.id);
-                html += `tr<td>${escapeHtml(exp.description)}</td><td>${escapeHtml(exp.category)}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${escapeHtml(exp.date)}</td><td><button class="delete-expense" data-idx="${idx}" style="background:var(--danger);color:white;padding:0.25rem 0.75rem;border-radius:0.5rem;">Delete</button></td></tr>`;
+                html += `<tr><td>${escapeHtml(exp.description)}</td><td>${escapeHtml(exp.category)}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${escapeHtml(exp.date)}</td><td><button class="delete-expense" data-idx="${idx}" style="background:var(--danger);color:white;padding:0.25rem 0.75rem;border-radius:0.5rem;">Delete</button></td></tr>`;
             });
-            html += '</tbody></table>';
+            html += '</tbody> </table>';
             container.innerHTML = html;
             
             document.querySelectorAll('.delete-expense').forEach(btn => {
