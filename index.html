@@ -9,16 +9,6 @@
         button { border: none !important; cursor: pointer; }
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
-        #limit-item input{
-                padding: 0.3rem;
-    background: var(--bg-tertiary);
-    border-radius: 1rem;
-    color: white;
-    /* width: 100px; */
-    /* margin-left: 6px; */
-    /* margin-top: 5px; */
-    margin-bottom: 5px;
-        }
         :root {
             --bg-deep: #000000;
             --bg-primary: #050505;
@@ -181,10 +171,10 @@
             background: var(--accent-primary);
             color: #000;
         }
-.logout-btn {
-    background: var(--accent-primary);
-    color: black;
-}
+        .logout-btn {
+            background: var(--accent-primary);
+            color: black;
+        }
         /* Backup Dropdown */
         .backup-dropdown {
             position: relative;
@@ -192,7 +182,6 @@
         }
         .backup-btn {
             background: var(--surface);
-            backgroud: var(--accent-primary);
             border: 1px solid var(--border);
             padding: 0.5rem 1.25rem;
             border-radius: 2rem;
@@ -580,6 +569,68 @@
         .search-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
         .search-input { flex: 1; padding: 0.75rem 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 1rem; color: var(--text-primary); }
 
+        /* Fixed Set Limit Modal Styles */
+        .limit-modal .limit-modal-content {
+            background: var(--surface);
+            border: 1px solid var(--accent-primary);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+        }
+        .limit-modal .limit-item {
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .limit-modal .limit-item span {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        .limit-modal .limit-item input {
+            width: 130px;
+            padding: 0.6rem 0.75rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .limit-modal .limit-item input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        .limit-modal .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+        .limit-modal .btn-primary {
+            background: var(--accent-primary);
+            color: #000;
+            font-weight: 700;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+        }
+        .limit-modal .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
             .main-container { padding: 1rem; }
             .stat-value { font-size: 1.75rem; }
@@ -587,6 +638,13 @@
             .nav-tabs { display: none; }
             .menu-icon { display: flex; align-items: center; justify-content: center; }
             .header-left { display: flex; align-items: center; gap: 1rem; }
+            .limit-modal .limit-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .limit-modal .limit-item input {
+                width: 100%;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -955,7 +1013,7 @@
             } else {
                 let html = '<table class="transactions-table"><thead> <th>Description</th><th>Category</th><th>Amount</th><th>Date</th> </thead><tbody>';
                 recent.forEach(e => {
-                    html += `<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
+                    html += `tr<td>${escapeHtml(e.description)}</td><td>${escapeHtml(e.category)}</td><td style="color:var(--danger);">-$${e.amount.toFixed(2)}</td><td>${escapeHtml(e.date)}</td></tr>`;
                 });
                 html += '</tbody></table>';
                 recentDiv.innerHTML = html;
@@ -1411,7 +1469,7 @@
                 const spent = d.expenses.reduce((s, e) => s + e.amount, 0);
                 const saved = d.salary - spent;
                 const rate = d.salary > 0 ? (saved / d.salary * 100) : 0;
-                html += `<tr><td>${formatMonthDisplay(m).slice(0, 7)}</td><td>$${d.salary.toFixed(0)}</td><td style="color:var(--danger);">-$${spent.toFixed(0)}</td><td style="color:var(--success);">$${saved.toFixed(0)}</td><td>${rate.toFixed(1)}%</td></tr>`;
+                html += `tr<td>${formatMonthDisplay(m).slice(0, 7)}</td><td>$${d.salary.toFixed(0)}</td><td style="color:var(--danger);">-$${spent.toFixed(0)}</td><td style="color:var(--success);">$${saved.toFixed(0)}</td><td>${rate.toFixed(1)}%</td></tr>`;
             });
             html += '</tbody></table>';
             perfDiv.innerHTML = html;
@@ -1439,7 +1497,7 @@
             let html = '<table class="transactions-table"><thead> <th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th> </thead><tbody>';
             [...filtered].reverse().forEach(exp => {
                 const idx = monthData.expenses.findIndex(e => e.id === exp.id);
-                html += `<tr><td>${escapeHtml(exp.description)}</td><td>${escapeHtml(exp.category)}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${escapeHtml(exp.date)}</td><td><button class="delete-expense" data-idx="${idx}" style="background:var(--danger);color:white;padding:0.25rem 0.75rem;border-radius:0.5rem;">Delete</button></td></tr>`;
+                html += `tr<td>${escapeHtml(exp.description)}</td><td>${escapeHtml(exp.category)}</td><td style="color:var(--danger);">-$${exp.amount.toFixed(2)}</td><td>${escapeHtml(exp.date)}</td><td><button class="delete-expense" data-idx="${idx}" style="background:var(--danger);color:white;padding:0.25rem 0.75rem;border-radius:0.5rem;">Delete</button></td></tr>`;
             });
             html += '</tbody></table>';
             container.innerHTML = html;
