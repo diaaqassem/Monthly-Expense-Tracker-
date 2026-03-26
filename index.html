@@ -173,6 +173,57 @@
             color: #000;
         }
 
+        /* Backup Dropdown */
+        .backup-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .backup-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1.25rem;
+            border-radius: 2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .backup-btn:hover {
+            background: var(--accent-primary);
+            color: #000;
+        }
+        .backup-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            min-width: 140px;
+            z-index: 100;
+            overflow: hidden;
+            margin-top: 0.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+        .backup-dropdown-content.show {
+            display: block;
+        }
+        .backup-dropdown-item {
+            padding: 0.75rem 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .backup-dropdown-item:hover {
+            background: var(--accent-primary);
+            color: #000;
+        }
+        .backup-dropdown-item.danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
         .nav-tabs {
             width:100%;
             max-width: 1600px;
@@ -253,14 +304,6 @@
 
         .main-container { max-width: 1600px; margin: 0 auto; padding: 2rem; }
         .backup-bar { display: flex; justify-content: flex-end; gap: 1rem; margin-bottom: 2rem; }
-        .backup-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 0.5rem 1.25rem;
-            border-radius: 2rem;
-            color: var(--text-secondary);
-        }
-        .backup-btn:hover { background: var(--accent-primary); color: #000; }
         .page { display: none; animation: fadeSlideUp 0.5s ease; }
         .page.active { display: block; }
         @keyframes fadeSlideUp {
@@ -552,7 +595,16 @@
                 <div class="header-left">
                     <button class="menu-icon" id="menuIcon">☰</button>
                 </div>
-                <div class="header-actions">
+                <div class="header-actions" style="display: flex; gap: 1rem; align-items: center;">
+                    <!-- Backup Dropdown -->
+                    <div class="backup-dropdown">
+                        <button class="backup-btn" id="backupBtn">BACKUP ▼</button>
+                        <div class="backup-dropdown-content" id="backupDropdown">
+                            <div class="backup-dropdown-item" id="exportItem">EXPORT</div>
+                            <div class="backup-dropdown-item" id="importItem">IMPORT</div>
+                            <div class="backup-dropdown-item danger" id="resetItem">RESET</div>
+                        </div>
+                    </div>
                     <button class="theme-btn" id="themeToggle">LIGHT MODE</button>
                     <button class="logout-btn" id="logoutBtn">LOGOUT</button>
                 </div>
@@ -582,13 +634,6 @@
         </div>
 
         <div class="main-container">
-            <div class="backup-bar">
-                <button class="backup-btn" id="exportBtn">EXPORT</button>
-                <button class="backup-btn" id="importBtn">IMPORT</button>
-                <input type="file" id="importFile" style="display: none;">
-                <button class="backup-btn" id="resetBtn">RESET</button>
-            </div>
-
             <!-- Dashboard Page -->
             <div id="dashboardPage" class="page active">
                 <div class="month-selector">
@@ -1418,6 +1463,37 @@
             updateAnalyticsPage();
         }
         
+        // Backup functions
+        function exportData() {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' }));
+            a.download = `nexus_backup_${new Date().toISOString().slice(0, 19)}.json`;
+            a.click();
+            showToast('Data exported successfully', 'success');
+        }
+        
+        function importData(file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    appData = JSON.parse(ev.target.result);
+                    saveToLocal();
+                    location.reload();
+                    showToast('Data imported successfully', 'success');
+                } catch (err) {
+                    showToast('Invalid file format', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function resetData() {
+            if (confirm('⚠️ WARNING: This will delete ALL your data! This action cannot be undone. Are you sure?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+        
         // Mobile menu functions
         function toggleMobileMenu() {
             const overlay = document.getElementById('mobileMenuOverlay');
@@ -1465,6 +1541,41 @@
         function initApp() {
             loadFromLocal();
             refreshAll();
+            
+            // Backup dropdown toggle
+            const backupBtn = document.getElementById('backupBtn');
+            const backupDropdown = document.getElementById('backupDropdown');
+            backupBtn.onclick = (e) => {
+                e.stopPropagation();
+                backupDropdown.classList.toggle('show');
+            };
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!backupBtn.contains(e.target) && !backupDropdown.contains(e.target)) {
+                    backupDropdown.classList.remove('show');
+                }
+            });
+            
+            // Backup items
+            document.getElementById('exportItem').onclick = () => {
+                exportData();
+                backupDropdown.classList.remove('show');
+            };
+            document.getElementById('importItem').onclick = () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    if (e.target.files.length) importData(e.target.files[0]);
+                };
+                input.click();
+                backupDropdown.classList.remove('show');
+            };
+            document.getElementById('resetItem').onclick = () => {
+                resetData();
+                backupDropdown.classList.remove('show');
+            };
             
             // Mobile menu event listeners
             document.getElementById('menuIcon').onclick = toggleMobileMenu;
@@ -1675,38 +1786,6 @@
                     document.getElementById('goalTarget').value = '';
                     document.getElementById('goalCurrent').value = '';
                     showToast('Goal added', 'success');
-                }
-            };
-            
-            document.getElementById('exportBtn').onclick = () => {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' }));
-                a.download = `nexus_backup_${new Date().toISOString().slice(0, 19)}.json`;
-                a.click();
-                showToast('Data exported', 'success');
-            };
-            
-            document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
-            document.getElementById('importFile').onchange = (e) => {
-                if (e.target.files.length) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        try {
-                            appData = JSON.parse(ev.target.result);
-                            saveToLocal();
-                            location.reload();
-                        } catch (err) {
-                            showToast('Invalid file', 'error');
-                        }
-                    };
-                    reader.readAsText(e.target.files[0]);
-                }
-            };
-            
-            document.getElementById('resetBtn').onclick = () => {
-                if (confirm('Reset all data? This cannot be undone.')) {
-                    localStorage.clear();
-                    location.reload();
                 }
             };
             
